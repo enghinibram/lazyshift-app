@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>LazyShift — Free Shift Work Calculator 2026</title>
+  <meta name="description" content="Free shift work calculator. Track your hours, monthly norm, annual leave, sick leave and overtime. Perfect for nurses, port workers, security staff and anyone working shifts." />
+  <meta name="keywords" content="shift calculator, shift work, rotating shifts, 12 hour shifts, 24 hour shifts, shift schedule, overtime calculator, shift planner" />
+  <link rel="canonical" href="https://lazyshift.app/" />
+
+  <meta property="og:title" content="LazyShift — Free Shift Work Calculator 2026" />
+  <meta property="og:description" content="Calculate your shift hours, monthly norm and leave days directly in the browser. Free, no install required." />
+  <meta property="og:url" content="https://lazyshift.app/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_GB" />
+  <meta property="og:image" content="https://lazyshift.app/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://lazyshift.app/og-image.jpg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "LazyShift",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web, Android, iOS",
+    "description": "Free shift work calculator. Tracks worked hours, monthly norms, overtime, annual leave (AL) and sick leave (SL) for any shift pattern: 12/24, 24/48, 8-hour rotating and more.",
+    "url": "https://lazyshift.app/",
+    "inLanguage": "en",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "12/24, 12/48, 24/48, 24/72 shift patterns",
+      "Official monthly working hour norms",
+      "Annual Leave (AL) and Sick Leave (SL) tracking",
+      "Public holidays display",
+      "Orthodox, Jewish and Islamic holidays",
+      "PDF export and print",
+      "Dark mode",
+      "Installable as PWA"
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I calculate my shift work hours?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Select your shift type (e.g. 12/24, 24/48), click a start day on the calendar and LazyShift generates your full schedule for any month automatically. Hours worked are compared against the official monthly norm."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the monthly working hour norm?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The monthly norm varies by month. For example: January 2026 — 144 hours, February — 160 hours, March — 176 hours. LazyShift uses official norms for each month."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I mark annual leave (AL) or sick leave (SL) days?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Press the AL or SL button, then click any days in the calendar. Each leave day is calculated as 8 hours per day regardless of your shift pattern."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work offline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. LazyShift can be installed as a PWA on your phone or desktop and works without an internet connection after the first load."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1D9E75" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== COOKIE BANNER ===== -->
+  <div id="cookie-banner">
+    <div class="cookie-text">
+      🍪 We use Google Analytics to understand how the app is used. No personal data is stored without your consent.
+      <a href="/privacy.html" target="_blank">Privacy policy</a>
+    </div>
+    <div class="cookie-actions">
+      <button class="cookie-btn cookie-accept" onclick="acceptCookies()">Accept</button>
+      <button class="cookie-btn cookie-reject" onclick="rejectCookies()">Decline</button>
+    </div>
+  </div>
+
+  <style>
+  #cookie-banner {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #1a1a2e;
+    color: #f0f0f0;
+    border-top: 2px solid #1D9E75;
+    padding: 14px 20px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+    z-index: 9999;
+    font-size: 14px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+  }
+  .cookie-text a { color: #1D9E75; text-decoration: underline; }
+  .cookie-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .cookie-btn { padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .cookie-accept { background: #1D9E75; color: white; }
+  .cookie-reject { background: transparent; color: #f0f0f0; border: 1px solid #555; }
+  @media (max-width: 480px) {
+    #cookie-banner { flex-direction: column; align-items: flex-start; }
+    .cookie-actions { width: 100%; }
+    .cookie-btn { flex: 1; }
+  }
+  </style>
+
+  <script>
+  function acceptCookies() {
+    localStorage.setItem("cookie_consent", "accepted");
+    document.getElementById("cookie-banner").style.display = "none";
+    loadGA();
+  }
+  function rejectCookies() {
+    localStorage.setItem("cookie_consent", "rejected");
+    document.getElementById("cookie-banner").style.display = "none";
+  }
+  function loadGA() {
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://www.googletagmanager.com/gtag/js?id=G-G2M9C9JKJE";
+    document.head.appendChild(s);
+    s.onload = function() {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
+      gtag("js", new Date());
+      gtag("config", "G-G2M9C9JKJE");
+    };
+  }
+  (function() {
+    var c = localStorage.getItem("cookie_consent");
+    if (c === "accepted") { loadGA(); }
+    else if (!c) { document.getElementById("cookie-banner").style.display = "flex"; }
+  })();
+  </script>
+
+  <!-- ===== AUTH OVERLAY ===== -->
+  <div id="auth-overlay" class="auth-overlay" style="display:none">
+    <div class="auth-box" id="auth-box-inner">
+      <h2 class="auth-title">LazyShift</h2>
+      <p class="auth-sub">Sign in to save your shift pattern</p>
+      <div id="auth-error" class="auth-error" style="display:none"></div>
+      <input type="email" id="auth-email" placeholder="Email" class="auth-input" />
+      <input type="password" id="auth-pass" placeholder="Password" class="auth-input" />
+      <div style="text-align:right; margin-top:-4px;">
+        <button class="auth-btn ghost" style="font-size:11px; padding:0;" onclick="showResetPassword()">Forgot password?</button>
+      </div>
+      <button class="auth-btn" onclick="doLogin()">Sign in</button>
+      <button class="auth-btn secondary" onclick="doRegister()">Create account</button>
+      <button class="auth-btn ghost" onclick="closeAuth()">Continue without account</button>
+    </div>
+  </div>
+
+  <!-- ===== RESET PASSWORD MODAL ===== -->
+  <div id="reset-overlay" class="auth-overlay" style="display:none">
+    <div class="auth-box">
+      <div style="font-size:36px; text-align:center; margin-bottom:0.5rem;">🔑</div>
+      <h2 class="auth-title">Reset password</h2>
+      <p class="auth-sub" id="reset-sub">Enter the email you registered with and we'll send you a reset link.</p>
+      <div id="reset-error" class="auth-error" style="display:none"></div>
+      <input type="email" id="reset-email" placeholder="Email" class="auth-input" />
+      <button class="auth-btn" onclick="doResetPassword()">Send reset link</button>
+      <button class="auth-btn ghost" onclick="closeResetPassword()">Back to sign in</button>
+    </div>
+  </div>
+
+  <!-- ===== PDF EMAIL MODAL ===== -->
+  <div id="pdf-modal" class="auth-overlay" style="display:none">
+    <div class="auth-box">
+      <div style="font-size:36px; text-align:center; margin-bottom:0.5rem;">📄</div>
+      <h2 class="auth-title">Free PDF export</h2>
+      <p class="auth-sub" id="pdf-modal-sub">Enter your email address and get 1 year of free PDF exports.</p>
+      <div id="pdf-modal-error" class="auth-error" style="display:none"></div>
+      <input type="email" id="pdf-email-input" placeholder="Email" class="auth-input" />
+      <button class="auth-btn" onclick="confirmPdfEmail()">Activate for free</button>
+      <button class="auth-btn ghost" onclick="closePdfModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ===== USER DROPDOWN ===== -->
+  <div id="user-dropdown" class="user-dropdown" style="display:none">
+    <div class="dropdown-info">
+      <div class="dropdown-name" id="dropdown-name"></div>
+      <div class="dropdown-email" id="dropdown-email"></div>
+    </div>
+    <hr class="dropdown-divider" />
+    <button class="dropdown-logout" onclick="doLogout()">🚪 Sign out</button>
+  </div>
+
+  <!-- ===== APP ===== -->
+  <div class="wrap">
+    <div class="app-header">
+      <h1>LazyShift</h1>
+      <div class="header-actions">
+        <button id="theme-toggle" class="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+        <button class="user-btn" id="login-btn" onclick="openAuth()">Sign in</button>
+      </div>
+    </div>
+
+    <!-- Shift type -->
+    <div class="section">
+      <label for="shift-type">Shift type</label>
+      <select id="shift-type">
+        <optgroup label="12-hour shifts">
+          <option value="12/24-12/48">12/24 – 12/48 (day, night, 2 days off)</option>
+          <option value="12/24">12/24 (alternating day / night)</option>
+          <option value="12/24-24/72">12/24 – 24/72 (day, night, 3 days off)</option>
+        </optgroup>
+        <optgroup label="8-hour shifts (3 rotations)">
+          <option value="8/3-morning">Fixed morning shift (06:00–14:00)</option>
+          <option value="8/3-afternoon">Fixed afternoon shift (14:00–22:00)</option>
+          <option value="8/3-night">Fixed night shift (22:00–06:00)</option>
+          <option value="8/3-rotating">Rotating 3 shifts (M→A→N→Off→Off→Off)</option>
+        </optgroup>
+        <optgroup label="24-hour shifts">
+          <option value="24/48">24/48 (work one day, off two days)</option>
+          <option value="24/72">24/72 (work one day, off three days)</option>
+        </optgroup>
+        <optgroup label="Custom">
+          <option value="custom">⚙️ Custom shift (you pick the days)</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <!-- Custom panel -->
+    <div id="custom-panel" class="section custom-panel" style="display:none">
+      <label>How many hours is your shift?</label>
+      <div class="custom-ore-row">
+        <input type="number" id="custom-hours-input" class="custom-ore-input"
+          value="12" min="1" max="24" step="1" />
+        <span class="custom-ore-label">hours / working day</span>
+      </div>
+      <p class="custom-hint">Click days in the calendar to mark the days you work. Click again to unmark.</p>
+    </div>
+
+    <!-- Holidays -->
+    <div class="section">
+      <label>Visible holidays</label>
+      <div class="filters">
+        <button class="filter-btn active-ort" id="btn-ort" data-type="ort">✦ Orthodox</button>
+        <button class="filter-btn active-iud" id="btn-iud" data-type="iud">✦ Jewish</button>
+        <button class="filter-btn active-isl" id="btn-isl" data-type="isl">✦ Islamic</button>
+      </div>
+    </div>
+
+    <!-- AL / SL -->
+    <div class="section">
+      <label>Leave</label>
+      <div class="co-cm-bar">
+        <button class="co-cm-btn co-btn" id="btn-edit-co">
+          🌴 AL <span class="co-count"></span>
+        </button>
+        <button class="co-cm-btn cm-btn" id="btn-edit-cm">
+          🤒 SL <span class="cm-count"></span>
+        </button>
+        <button class="co-cm-btn clear-btn" id="btn-clear-co">
+          🗑 Clear all
+        </button>
+      </div>
+      <div id="edit-hint" class="edit-hint" style="display:none"></div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="section">
+      <p class="info" id="start-info">Click on a DAY shift to set the pattern.</p>
+      <p id="nav-notice" style="display:none"></p>
+      <div class="cal-header">
+        <button id="prev-month">&#8592;</button>
+        <span id="month-label"></span>
+        <button id="next-month">&#8594;</button>
+      </div>
+      <div class="cal-grid" id="cal"></div>
+
+      <div class="legend-shifts">
+        <div class="leg-item"><div class="leg-dot leg-zi"></div>Day</div>
+        <div class="leg-item"><div class="leg-dot leg-noapte"></div>Night</div>
+        <div class="leg-item"><div class="leg-dot leg-liber"></div>Off</div>
+        <div class="leg-item"><div class="leg-dot leg-co"></div>AL</div>
+        <div class="leg-item"><div class="leg-dot leg-cm"></div>SL</div>
+        <div class="leg-item"><span class="leg-text ort">Orange</span>&nbsp;= Orthodox</div>
+        <div class="leg-item"><span class="leg-text iud">Purple</span>&nbsp;= Jewish</div>
+        <div class="leg-item"><span class="leg-text isl">Green</span>&nbsp;= Islamic</div>
+        <div class="leg-item"><span style="font-size:9px;background:#c0392b;color:white;padding:1px 4px;border-radius:3px;font-weight:700;">PH</span>&nbsp;= Public Holiday</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="ore-lucrate">—</div><div class="stat-lbl">hours worked this month</div></div>
+      <div class="stat"><div class="stat-val" id="norma">—</div><div class="stat-lbl">monthly norm (hours)</div></div>
+      <div class="stat"><div class="stat-val" id="ore-extra">—</div><div class="stat-lbl">extra / minus hours</div></div>
+    </div>
+
+    <!-- ===== ACTION BUTTONS ===== -->
+    <div id="action-buttons" class="action-buttons">
+      <button class="action-btn print-btn" onclick="doPrint()" title="Print calendar">
+        🖨️ Print
+      </button>
+      <button class="action-btn pdf-btn" onclick="tryExportPdf()" title="Export to PDF">
+        📄 PDF
+      </button>
+      <a class="action-btn coffee-btn" href="https://revolut.me/enghin_i" target="_blank" rel="noopener" title="Buy me a coffee">
+        ☕ Coffee?
+      </a>
+      <a class="action-btn" href="/salary-calculator.html" title="Net salary calculator">
+        💰 Salary
+      </a>
+    </div>
+
+    <button id="pwa-install-btn" class="pwa-btn" style="display:none" onclick="openPwaModal()">
+      📱 Install app on your phone
+    </button>
+
+    <!-- ===== SEO CONTENT ===== -->
+    <section class="seo-section">
+      <h2>What is LazyShift?</h2>
+      <p>
+        LazyShift is a free shift work calculator for anyone working rotating schedules — nurses, port workers, security guards, factory staff, police, firefighters and more. It automatically calculates your worked hours, monthly norm and overtime for any shift pattern.
+      </p>
+
+      <h2>Supported shift patterns</h2>
+      <p>
+        LazyShift supports the most common shift patterns: <strong>12/24</strong> (alternating day and night), <strong>12/24-12/48</strong> (day, night, two days off), <strong>24/48</strong> and <strong>24/72</strong> for long shifts, and all three 8-hour shifts — morning, afternoon and night, including rotating. There's also a custom mode where you pick your own working days.
+      </p>
+
+      <h2>How does it work?</h2>
+      <p>
+        Select your shift type, click a start day in the calendar and your schedule is generated automatically for any month. You can mark annual leave (AL) and sick leave (SL) days — each counted as 8 hours per day. The calculator uses the official monthly working hour norms.
+      </p>
+
+      <h2>Frequently asked questions</h2>
+      <dl class="faq-list">
+        <dt>Is it free?</dt>
+        <dd>Completely free. No ads, no subscription.</dd>
+
+        <dt>Does it work on mobile?</dt>
+        <dd>Yes — it can be installed as an app on Android and iOS directly from your browser, no App Store needed.</dd>
+
+        <dt>Can I export my timesheet?</dt>
+        <dd>Yes, there's a PDF export and direct print function.</dd>
+
+        <dt>How is overtime calculated?</dt>
+        <dd>Any hours worked above the monthly norm are overtime. LazyShift shows you instantly whether you're over or under your monthly target.</dd>
+      </dl>
+
+      <h2>Useful articles</h2>
+      <ul class="article-links">
+        <li><a href="/salary-calculator.html">Net salary calculator 2026 — with bonuses and shift pay</a></li>
+        <li><a href="/articles/shift-timesheet.html">How to track your shift timesheet — complete guide 2026</a></li>
+        <li><a href="/articles/night-shift-bonus.html">Night shift bonus 2026 — how much and how to calculate it</a></li>
+        <li><a href="/articles/shifts-port-hospital-security.html">Shift work at ports, hospitals and security — what you need to know</a></li>
+        <li><a href="/articles/leave-in-shifts.html">Annual leave in shift work — how many days you're entitled to</a></li>
+        <li><a href="/articles/overtime.html">Overtime calculator 2026 — over or under your monthly norm</a></li>
+      </ul>
+    </section>
+
+  </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
+
+  <!-- ===== PWA INSTALL MODAL ===== -->
+  <div id="pwa-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:#1e1e2e; border-radius:16px; max-width:380px; width:100%; padding:24px; position:relative; box-shadow:0 8px 40px rgba(0,0,0,0.4);">
+      <button onclick="closePwaModal()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#ccc;">&#x2715;</button>
+      <div style="text-align:center; margin-bottom:16px;">
+        <div style="font-size:40px;">📱</div>
+        <h2 style="margin:8px 0 4px; font-size:1.2rem; color:#f0f0f0;">Install LazyShift</h2>
+        <p style="font-size:13px; color:#aaa; margin:0;">Quick access from your home screen, works offline too.</p>
+      </div>
+
+      <!-- ANDROID -->
+      <div id="pwa-android" style="display:none;">
+        <div style="background:#0f3d2e; border-radius:10px; padding:14px; margin-bottom:10px;">
+          <p style="font-size:13px; font-weight:700; color:#1D9E75; margin:0 0 10px;">🤖 Chrome on Android</p>
+          <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:8px;">
+            <span style="background:#1D9E75; color:white; border-radius:50%; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">1</span>
+            <span style="font-size:13px; color:#f0f0f0;">Tap the <strong>3-dot menu ⋮</strong> in the top-right corner of Chrome</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:8px;">
+            <span style="background:#1D9E75; color:white; border-radius:50%; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">2</span>
+            <span style="font-size:13px; color:#f0f0f0;">Select <strong>"Add to Home screen"</strong></span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <span style="background:#1D9E75; color:white; border-radius:50%; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">3</span>
+            <span style="font-size:13px; color:#f0f0f0;">Tap <strong>"Install"</strong> or <strong>"Add"</strong> — done!</span>
+          </div>
+        </div>
+        <div id="pwa-native-btn-wrap" style="display:none; margin-bottom:10px;">
+          <button id="pwa-native-btn" onclick="triggerNativeInstall()" style="width:100%; background:#1D9E75; color:white; border:none; border-radius:10px; padding:12px; font-size:15px; font-weight:700; cursor:pointer;">🚀 Install now</button>
+          <p style="font-size:11px; color:#aaa; text-align:center; margin:4px 0 0;">Or follow the steps above</p>
+        </div>
+      </div>
+
+      <!-- IOS -->
+      <div id="pwa-ios" style="display:none;">
+        <div style="background:#0f3d2e; border-radius:10px; padding:14px; margin-bottom:10px;">
+          <p style="font-size:13px; font-weight:700; color:#1D9E75; margin:0 0 10px;">🍎 Safari on iPhone / iPad</p>
+          <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:8px;">
+            <span style="background:#1D9E75; color:white; border-radius:50%; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">1</span>
+            <span style="font-size:13px; color:#f0f0f0;">Open the site in <strong>Safari</strong> (not Chrome or another browser)</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:8px;">
+            <span style="background:#1D9E75; color:white; border-radius:50%; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">2</span>
+            <span style="font-size:13px; color:#f0f0f0;">Tap the <strong>Share ⬆️</strong> button in the bottom bar</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:8px;">
+            <span style="background:#1D9E75; color:white; border-radius:50%; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">3</span>
+            <span style="font-size:13px; color:#f0f0f0;">Scroll down and tap <strong>"Add to Home Screen" +</strong></span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <span style="background:#1D9E75; color:white; border-radius:50%; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">4</span>
+            <span style="font-size:13px; color:#f0f0f0;">Tap <strong>"Add"</strong> in the top-right — done!</span>
+          </div>
+        </div>
+        <div style="background:#1a1a2e; border-radius:8px; padding:10px; font-size:12px; color:#aaa; text-align:center;">
+          ⚠️ On iOS, installation only works <strong>in Safari</strong>
+        </div>
+      </div>
+
+      <!-- DESKTOP -->
+      <div id="pwa-desktop" style="display:none;">
+        <div style="background:#0f3d2e; border-radius:10px; padding:14px; margin-bottom:10px;">
+          <p style="font-size:13px; font-weight:700; color:#1D9E75; margin:0 0 10px;">💻 Desktop (Chrome / Edge)</p>
+          <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:8px;">
+            <span style="background:#1D9E75; color:white; border-radius:50%; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">1</span>
+            <span style="font-size:13px; color:#f0f0f0;">Look for the <strong>"Install" +</strong> icon in the address bar (right side)</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <span style="background:#1D9E75; color:white; border-radius:50%; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">2</span>
+            <span style="font-size:13px; color:#f0f0f0;">Click <strong>"Install"</strong> in the popup — done!</span>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="closePwaModal()" style="width:100%; background:transparent; border:1px solid #444; border-radius:10px; padding:10px; color:#ccc; font-size:14px; cursor:pointer; margin-top:4px;">Got it, close</button>
+    </div>
+  </div>
+
+  <script>
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    var wrap = document.getElementById('pwa-native-btn-wrap');
+    if (wrap) wrap.style.display = 'block';
+  });
+  function openPwaModal() {
+    var modal = document.getElementById('pwa-modal');
+    modal.style.display = 'flex';
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    var isAndroid = /Android/.test(ua);
+    document.getElementById('pwa-ios').style.display = isIOS ? 'block' : 'none';
+    document.getElementById('pwa-android').style.display = (!isIOS && isAndroid) ? 'block' : 'none';
+    document.getElementById('pwa-desktop').style.display = (!isIOS && !isAndroid) ? 'block' : 'none';
+  }
+  function closePwaModal() {
+    document.getElementById('pwa-modal').style.display = 'none';
+  }
+  function triggerNativeInstall() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(result) {
+        deferredPrompt = null;
+        if (result.outcome === 'accepted') closePwaModal();
+      });
+    }
+  }
+  document.getElementById('pwa-modal').addEventListener('click', function(e) {
+    if (e.target === this) closePwaModal();
+  });
+  </script>
+
+</body>
+</html>
