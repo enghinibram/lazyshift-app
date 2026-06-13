@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://lazyshift.com/</loc>
+    <loc>https://app.lazyshift.com/</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://lazyshift.com/salary-calculator.html</loc>
+    <loc>https://app.lazyshift.com/salary-calculator.html</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://lazyshift.com/articles/shift-timesheet.html</loc>
+    <loc>https://app.lazyshift.com/articles/shift-timesheet.html</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://lazyshift.com/articles/night-shift-bonus.html</loc>
+    <loc>https://app.lazyshift.com/articles/night-shift-bonus.html</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://lazyshift.com/articles/overtime.html</loc>
+    <loc>https://app.lazyshift.com/articles/overtime.html</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://lazyshift.com/articles/leave-in-shifts.html</loc>
+    <loc>https://app.lazyshift.com/articles/leave-in-shifts.html</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://lazyshift.com/articles/shifts-port-hospital-security.html</loc>
+    <loc>https://app.lazyshift.com/articles/shifts-port-hospital-security.html</loc>
     <lastmod>2026-06-13</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
