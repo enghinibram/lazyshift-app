@@ -345,6 +345,31 @@
       📱 Install app on your phone
     </button>
 
+    <button class="pwa-btn" onclick="openShareModal()" style="background:#25D366; margin-top:8px;">
+      📤 Share with a colleague
+    </button>
+
+    <!-- ===== SHARE MODAL ===== -->
+    <div id="share-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center; padding:16px;">
+      <div style="background:#1e1e1e; border-radius:16px; padding:24px; max-width:340px; width:100%; position:relative;">
+        <button onclick="closeShareModal()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#ccc;">&#x2715;</button>
+        <p style="margin:0 0 6px; font-size:13px; color:#aaa; text-align:center;">Share the app with a colleague</p>
+        <h2 style="margin:0 0 16px; font-size:1.1rem; color:#f0f0f0; text-align:center;">LazyShift</h2>
+        <a href="#" onclick="shareWhatsApp(); return false;" style="display:flex; align-items:center; gap:12px; background:#25D366; color:white; text-decoration:none; border-radius:10px; padding:12px 16px; font-size:15px; font-weight:600; margin-bottom:10px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.089.534 4.122 1.548 5.911L0 24l6.302-1.524A11.947 11.947 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.823 9.823 0 01-5.011-1.374l-.36-.214-3.732.902.939-3.618-.234-.372A9.823 9.823 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+          WhatsApp
+        </a>
+        <a href="#" onclick="shareFacebook(); return false;" style="display:flex; align-items:center; gap:12px; background:#1877F2; color:white; text-decoration:none; border-radius:10px; padding:12px 16px; font-size:15px; font-weight:600; margin-bottom:10px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.791-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+          Facebook
+        </a>
+        <button onclick="copyLink()" id="copy-btn" style="display:flex; align-items:center; gap:12px; background:#333; color:white; border:none; border-radius:10px; padding:12px 16px; font-size:15px; font-weight:600; width:100%; cursor:pointer;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <span id="copy-btn-text">Copy link (Instagram etc.)</span>
+        </button>
+      </div>
+    </div>
+
     <!-- ===== SEO CONTENT ===== -->
     <section class="seo-section">
       <h2>What is LazyShift?</h2>
@@ -511,6 +536,29 @@
   document.getElementById('pwa-modal').addEventListener('click', function(e) {
     if (e.target === this) closePwaModal();
   });
+  document.getElementById('share-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeShareModal();
+  });
+  function openShareModal() {
+    document.getElementById('share-modal').style.display = 'flex';
+  }
+  function closeShareModal() {
+    document.getElementById('share-modal').style.display = 'none';
+  }
+  function shareWhatsApp() {
+    var msg = encodeURIComponent('Found this shift calculator — automatically calculates hours and overtime 👇\nhttps://lazyshift.app');
+    window.open('https://wa.me/?text=' + msg, '_blank');
+  }
+  function shareFacebook() {
+    window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://lazyshift.app'), '_blank');
+  }
+  function copyLink() {
+    navigator.clipboard.writeText('https://lazyshift.app').then(function() {
+      var btn = document.getElementById('copy-btn-text');
+      btn.textContent = '✓ Link copied!';
+      setTimeout(function() { btn.textContent = 'Copy link (Instagram etc.)'; }, 2500);
+    });
+  }
   </script>
 
 </body>
