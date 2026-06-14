@@ -680,14 +680,65 @@ let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  document.getElementById('pwa-install-btn').style.display = 'block';
+  const wrap = document.getElementById('pwa-native-btn-wrap');
+  if (wrap) wrap.style.display = 'block';
 });
-document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+
+function openPwaModal() {
+  const modal = document.getElementById('pwa-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isAndroid = /Android/.test(ua);
+  document.getElementById('pwa-ios').style.display = isIOS ? 'block' : 'none';
+  document.getElementById('pwa-android').style.display = (!isIOS && isAndroid) ? 'block' : 'none';
+  document.getElementById('pwa-desktop').style.display = (!isIOS && !isAndroid) ? 'block' : 'none';
+}
+function closePwaModal() {
+  const modal = document.getElementById('pwa-modal');
+  if (modal) modal.style.display = 'none';
+}
+function triggerNativeInstall() {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') document.getElementById('pwa-install-btn').style.display = 'none';
-  deferredPrompt = null;
+  deferredPrompt.userChoice.then((result) => {
+    deferredPrompt = null;
+    if (result.outcome === 'accepted') closePwaModal();
+  });
+}
+
+// ===== Share =====
+function openShareModal() {
+  const modal = document.getElementById('share-modal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeShareModal() {
+  const modal = document.getElementById('share-modal');
+  if (modal) modal.style.display = 'none';
+}
+function shareWhatsApp() {
+  const msg = encodeURIComponent('Found this shift calculator — automatically calculates hours and overtime 👇\nhttps://lazyshift.app');
+  window.open('https://wa.me/?text=' + msg, '_blank');
+}
+function shareFacebook() {
+  window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://lazyshift.app'), '_blank');
+}
+function copyLink() {
+  navigator.clipboard.writeText('https://lazyshift.app').then(() => {
+    const btn = document.getElementById('copy-btn-text');
+    if (btn) {
+      btn.textContent = '✓ Link copied!';
+      setTimeout(() => { btn.textContent = 'Copy link (Instagram etc.)'; }, 2500);
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const pwaModal = document.getElementById('pwa-modal');
+  if (pwaModal) pwaModal.addEventListener('click', (e) => { if (e.target === pwaModal) closePwaModal(); });
+  const shareModal = document.getElementById('share-modal');
+  if (shareModal) shareModal.addEventListener('click', (e) => { if (e.target === shareModal) closeShareModal(); });
 });
 
 // ===== Reset Password =====

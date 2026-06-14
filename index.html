@@ -503,63 +503,6 @@
     </div>
   </div>
 
-  <script>
-  var deferredPrompt = null;
-  window.addEventListener('beforeinstallprompt', function(e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    var wrap = document.getElementById('pwa-native-btn-wrap');
-    if (wrap) wrap.style.display = 'block';
-  });
-  function openPwaModal() {
-    var modal = document.getElementById('pwa-modal');
-    modal.style.display = 'flex';
-    var ua = navigator.userAgent || '';
-    var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-    var isAndroid = /Android/.test(ua);
-    document.getElementById('pwa-ios').style.display = isIOS ? 'block' : 'none';
-    document.getElementById('pwa-android').style.display = (!isIOS && isAndroid) ? 'block' : 'none';
-    document.getElementById('pwa-desktop').style.display = (!isIOS && !isAndroid) ? 'block' : 'none';
-  }
-  function closePwaModal() {
-    document.getElementById('pwa-modal').style.display = 'none';
-  }
-  function triggerNativeInstall() {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function(result) {
-        deferredPrompt = null;
-        if (result.outcome === 'accepted') closePwaModal();
-      });
-    }
-  }
-  document.getElementById('pwa-modal').addEventListener('click', function(e) {
-    if (e.target === this) closePwaModal();
-  });
-  document.getElementById('share-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeShareModal();
-  });
-  function openShareModal() {
-    document.getElementById('share-modal').style.display = 'flex';
-  }
-  function closeShareModal() {
-    document.getElementById('share-modal').style.display = 'none';
-  }
-  function shareWhatsApp() {
-    var msg = encodeURIComponent('Found this shift calculator — automatically calculates hours and overtime 👇\nhttps://lazyshift.app');
-    window.open('https://wa.me/?text=' + msg, '_blank');
-  }
-  function shareFacebook() {
-    window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://lazyshift.app'), '_blank');
-  }
-  function copyLink() {
-    navigator.clipboard.writeText('https://lazyshift.app').then(function() {
-      var btn = document.getElementById('copy-btn-text');
-      btn.textContent = '✓ Link copied!';
-      setTimeout(function() { btn.textContent = 'Copy link (Instagram etc.)'; }, 2500);
-    });
-  }
-  </script>
 
 </body>
 </html>
