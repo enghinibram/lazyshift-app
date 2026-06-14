@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Net Salary Calculator 2026 — Shifts & Bonuses | LazyShift</title>
-  <meta name="description" content="Calculate your net salary from gross in 2026. Includes night shift bonus, overtime pay and social contributions. Free, for shift workers." />
+  <meta name="description" content="Calculate your net take-home pay from gross salary. Supports any country — enter your own tax rates or pick from presets. Includes night shift bonus and overtime." />
   <link rel="canonical" href="https://app.lazyshift.com/salary-calculator.html" />
   <link rel="stylesheet" href="article.css" />
   <style>
@@ -22,14 +22,46 @@
       color: #666;
       display: block;
       margin-bottom: 5px;
+      font-weight: 500;
     }
-    .input-group input, .input-group select {
+    .input-group input,
+    .input-group select {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid #ddd;
       border-radius: 8px;
       font-size: 15px;
       background: #fff;
+      box-sizing: border-box;
+    }
+    .row2 { display: flex; gap: 10px; }
+    .row2 > * { flex: 1; }
+    .pct-wrap { position: relative; }
+    .pct-wrap input { padding-right: 28px; }
+    .pct-sym {
+      position: absolute; right: 10px; top: 50%;
+      transform: translateY(-50%);
+      color: #666; font-size: 13px; pointer-events: none;
+    }
+    .tax-section {
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: #fff;
+    }
+    .tax-section h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+      margin: 0 0 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tax-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
     }
     .calc-btn {
       width: 100%;
@@ -63,12 +95,12 @@
       grid-column: 1 / -1;
     }
     .result-val {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
       color: #1a1a1a;
     }
     .result-item.highlight .result-val {
-      font-size: 28px;
+      font-size: 26px;
       color: #1D9E75;
     }
     .result-lbl {
@@ -90,6 +122,21 @@
       color: #7A5800;
       margin-bottom: 1rem;
     }
+    .note {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+      display: block;
+    }
+    .preset-note {
+      font-size: 12px;
+      color: #888;
+      margin-top: 6px;
+      font-style: italic;
+    }
+    @media (max-width: 480px) {
+      .tax-grid { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -97,67 +144,111 @@
     <nav class="breadcrumb"><a href="/">← LazyShift</a></nav>
 
     <h1>Net Salary Calculator 2026</h1>
-    <p>Calculate your net take-home pay from gross salary, including night shift bonus, overtime and all tax deductions.</p>
+    <p>Calculate your net take-home pay. Pick your country for preset tax rates — or enter your own numbers for any country.</p>
 
     <hr class="divider" />
 
     <div class="calc-card">
+
+      <!-- COUNTRY PRESET -->
       <div class="input-group">
-        <label>Base gross salary (RON)</label>
-        <input type="number" id="brut" placeholder="e.g. 5000" min="0" step="100" />
+        <label>Country preset</label>
+        <select id="country" onchange="applyPreset()">
+          <option value="ro">🇷🇴 Romania</option>
+          <option value="gb">🇬🇧 United Kingdom</option>
+          <option value="de">🇩🇪 Germany</option>
+          <option value="fr">🇫🇷 France</option>
+          <option value="it">🇮🇹 Italy</option>
+          <option value="es">🇪🇸 Spain</option>
+          <option value="us">🇺🇸 United States</option>
+          <option value="other">🌍 Other / Custom</option>
+        </select>
+        <span class="preset-note" id="preset-note">Rates pre-filled from Romanian law 2026. You can edit any field.</span>
       </div>
 
-      <div class="input-group">
-        <label>Night hours this month</label>
-        <div style="display:flex; gap:10px;">
-          <input type="number" id="ore-noapte" placeholder="e.g. 48" min="0" step="1" value="0" style="flex:2" />
-          <div style="flex:1; position:relative;">
-            <input type="number" id="procent-noapte" placeholder="%" min="0" max="100" step="1" value="25" style="width:100%; padding-right:28px;" />
-            <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:#666; font-size:13px; pointer-events:none;">%</span>
+      <!-- GROSS + CURRENCY -->
+      <div class="row2">
+        <div class="input-group">
+          <label>Base gross salary</label>
+          <input type="number" id="brut" placeholder="e.g. 5000" min="0" step="100" />
+        </div>
+        <div class="input-group">
+          <label>Currency</label>
+          <select id="currency">
+            <option value="RON">RON</option>
+            <option value="GBP">GBP</option>
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+            <option value="CHF">CHF</option>
+            <option value="PLN">PLN</option>
+            <option value="HUF">HUF</option>
+            <option value="CZK">CZK</option>
+            <option value="SEK">SEK</option>
+            <option value="NOK">NOK</option>
+            <option value="DKK">DKK</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TAX RATES -->
+      <div class="tax-section">
+        <h3>Tax &amp; contribution rates (employee portion)</h3>
+        <div class="tax-grid">
+          <div class="input-group">
+            <label>Social / Pension</label>
+            <div class="pct-wrap">
+              <input type="number" id="pct-social" min="0" max="50" step="0.1" value="25" />
+              <span class="pct-sym">%</span>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Health insurance</label>
+            <div class="pct-wrap">
+              <input type="number" id="pct-health" min="0" max="20" step="0.1" value="10" />
+              <span class="pct-sym">%</span>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Income tax</label>
+            <div class="pct-wrap">
+              <input type="number" id="pct-tax" min="0" max="60" step="0.1" value="10" />
+              <span class="pct-sym">%</span>
+            </div>
           </div>
         </div>
-        <small style="color:#999; font-size:11px; margin-top:4px; display:block;">Default night bonus is 25% (legal minimum). Change if your employer applies a different rate.</small>
+        <span class="note">Presets are approximations. Always check your payslip or local tax authority for exact rates.</span>
       </div>
 
-      <div class="input-group">
-        <label>Overtime hours this month</label>
-        <div style="display:flex; gap:10px;">
-          <input type="number" id="ore-extra" placeholder="e.g. 10" min="0" step="1" value="0" style="flex:2" />
-          <div style="flex:1; position:relative;">
-            <input type="number" id="procent-extra" placeholder="%" min="0" max="200" step="1" value="75" style="width:100%; padding-right:28px;" />
-            <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:#666; font-size:13px; pointer-events:none;">%</span>
-          </div>
-        </div>
-        <small style="color:#999; font-size:11px; margin-top:4px; display:block;">Legal minimum overtime bonus is 75%. Change if your employer applies a different rate.</small>
-      </div>
-
+      <!-- MONTHLY NORM -->
       <div class="input-group">
         <label>Monthly norm (hours)</label>
-        <select id="norma-select">
-          <option value="144">January 2026 — 144 hours</option>
-          <option value="160" selected>February 2026 — 160 hours</option>
-          <option value="176">March 2026 — 176 hours</option>
-          <option value="160">April 2026 — 160 hours</option>
-          <option value="152">May 2026 — 152 hours</option>
-          <option value="160">June 2026 — 160 hours</option>
-          <option value="184">July 2026 — 184 hours</option>
-          <option value="168">August 2026 — 168 hours</option>
-          <option value="176">September 2026 — 176 hours</option>
-          <option value="176">October 2026 — 176 hours</option>
-          <option value="152">November 2026 — 152 hours</option>
-          <option value="168">December 2026 — 168 hours</option>
-        </select>
+        <input type="number" id="norma" placeholder="e.g. 160" min="1" step="1" value="160" />
       </div>
 
+      <!-- NIGHT BONUS -->
       <div class="input-group">
-        <label>Dependants (for personal deduction)</label>
-        <select id="dependenti">
-          <option value="0">No dependants</option>
-          <option value="1">1 person</option>
-          <option value="2">2 people</option>
-          <option value="3">3 people</option>
-          <option value="4">4+ people</option>
-        </select>
+        <label>Night hours this month</label>
+        <div class="row2">
+          <input type="number" id="ore-noapte" placeholder="e.g. 48" min="0" step="1" value="0" />
+          <div class="pct-wrap">
+            <input type="number" id="procent-noapte" min="0" max="100" step="1" value="25" />
+            <span class="pct-sym">%</span>
+          </div>
+        </div>
+        <span class="note">Night bonus % on top of hourly rate. Adjust to your employer's rate.</span>
+      </div>
+
+      <!-- OVERTIME -->
+      <div class="input-group">
+        <label>Overtime hours this month</label>
+        <div class="row2">
+          <input type="number" id="ore-extra" placeholder="e.g. 10" min="0" step="1" value="0" />
+          <div class="pct-wrap">
+            <input type="number" id="procent-extra" min="0" max="200" step="1" value="75" />
+            <span class="pct-sym">%</span>
+          </div>
+        </div>
+        <span class="note">Overtime bonus % on top of hourly rate. Legal minimum varies by country.</span>
       </div>
 
       <button class="calc-btn" onclick="calculate()">Calculate net salary</button>
@@ -170,96 +261,98 @@
 
     <hr class="divider" />
 
-    <h2>How is net salary calculated in 2026?</h2>
-    <p>Three mandatory contributions are deducted from gross salary (based on Romanian tax law):</p>
-    <ul>
-      <li><strong>Pension (CAS) — 25%</strong> of gross salary</li>
-      <li><strong>Health insurance (CASS) — 10%</strong> of gross salary</li>
-      <li><strong>Income tax — 10%</strong> of taxable income (gross minus CAS, CASS and personal deduction)</li>
-    </ul>
-    <p>Bonuses (night shift, overtime) are added to gross before the calculation.</p>
+    <h2>How does this calculator work?</h2>
+    <p>The formula is straightforward regardless of country:</p>
+    <ol>
+      <li>Start with your <strong>base gross salary</strong></li>
+      <li>Add any <strong>night shift bonus</strong> and <strong>overtime bonus</strong> (calculated from your hourly rate)</li>
+      <li>Deduct <strong>social/pension contribution</strong> (your share)</li>
+      <li>Deduct <strong>health insurance</strong> (your share)</li>
+      <li>Apply <strong>income tax</strong> to the remaining amount</li>
+    </ol>
+    <p>The result is your estimated <strong>net take-home salary</strong>.</p>
 
-    <h2>What is the personal deduction?</h2>
-    <p>Employees earning a gross salary up to 3,600 RON benefit from a personal deduction that reduces the taxable base. The exact amount depends on the number of dependants and the gross salary.</p>
+    <h2>Country preset rates</h2>
+    <p>Presets use approximate employee-portion rates for 2026. Employer contributions are not included (they don't affect your take-home). For countries with progressive tax (UK, Germany, USA), the preset uses the most common marginal rate for shift workers. Always verify with your payslip.</p>
 
     <div class="cta-box">
-      <p>Track your shift schedule with <a href="/">LazyShift</a> — free.</p>
+      <p>Track your shift schedule and monthly hours with <a href="/">LazyShift</a> — free.</p>
     </div>
   </div>
 
   <script>
-    function getDeduction(gross, dependants) {
-      if (gross <= 2000) {
-        const base = [300, 400, 500, 600, 700][Math.min(dependants, 4)];
-        return base;
-      } else if (gross <= 3600) {
-        const base = [300, 400, 500, 600, 700][Math.min(dependants, 4)];
-        return Math.round(base * (1 - (gross - 2000) / 1600));
-      }
-      return 0;
+    const PRESETS = {
+      ro:    { social: 25,   health: 10,  tax: 10,  currency: 'RON', norm: 160, note: 'Rates from Romanian law 2026: CAS 25%, CASS 10%, income tax 10%.' },
+      gb:    { social: 8,    health: 0,   tax: 20,  currency: 'GBP', norm: 160, note: 'UK 2026: NI 8% (employee), income tax 20% basic rate. Health included in NI.' },
+      de:    { social: 20.5, health: 7.3, tax: 14,  currency: 'EUR', norm: 168, note: 'Germany 2026: pension+unemployment ≈ 20.5%, health ≈ 7.3%, income tax from 14%.' },
+      fr:    { social: 22,   health: 0,   tax: 11,  currency: 'EUR', norm: 151, note: 'France 2026: employee charges ≈ 22%, income tax 11% (2nd bracket). Health included.' },
+      it:    { social: 9.19, health: 0,   tax: 23,  currency: 'EUR', norm: 160, note: 'Italy 2026: INPS employee ≈ 9.19%, IRPEF 23% first bracket.' },
+      es:    { social: 6.35, health: 0,   tax: 19,  currency: 'EUR', norm: 160, note: 'Spain 2026: employee SS ≈ 6.35%, income tax 19% (first bracket).' },
+      us:    { social: 6.2,  health: 1.45,tax: 22,  currency: 'USD', norm: 160, note: 'USA 2026: Social Security 6.2%, Medicare 1.45%, federal income tax 22% bracket.' },
+      other: { social: 0,    health: 0,   tax: 0,   currency: 'EUR', norm: 160, note: 'Enter your own rates below.' },
+    };
+
+    function applyPreset() {
+      const p = PRESETS[document.getElementById('country').value];
+      document.getElementById('pct-social').value  = p.social;
+      document.getElementById('pct-health').value  = p.health;
+      document.getElementById('pct-tax').value     = p.tax;
+      document.getElementById('currency').value    = p.currency;
+      document.getElementById('norma').value       = p.norm;
+      document.getElementById('preset-note').textContent = p.note;
+      document.getElementById('results').style.display = 'none';
+    }
+
+    function fmt(val, currency) {
+      return val.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + currency;
     }
 
     function calculate() {
-      const gross = parseFloat(document.getElementById('brut').value) || 0;
-      const nightHours = parseFloat(document.getElementById('ore-noapte').value) || 0;
-      const overtimeHours = parseFloat(document.getElementById('ore-extra').value) || 0;
-      const norm = parseFloat(document.getElementById('norma-select').value) || 160;
-      const dependants = parseInt(document.getElementById('dependenti').value) || 0;
+      const gross        = parseFloat(document.getElementById('brut').value) || 0;
+      const norm         = parseFloat(document.getElementById('norma').value) || 160;
+      const nightHours   = parseFloat(document.getElementById('ore-noapte').value) || 0;
+      const overtimeHours= parseFloat(document.getElementById('ore-extra').value) || 0;
+      const nightPct     = (parseFloat(document.getElementById('procent-noapte').value) || 0) / 100;
+      const overtimePct  = (parseFloat(document.getElementById('procent-extra').value) || 0) / 100;
+      const pctSocial    = (parseFloat(document.getElementById('pct-social').value) || 0) / 100;
+      const pctHealth    = (parseFloat(document.getElementById('pct-health').value) || 0) / 100;
+      const pctTax       = (parseFloat(document.getElementById('pct-tax').value) || 0) / 100;
+      const currency     = document.getElementById('currency').value;
 
-      if (gross <= 0) {
-        alert('Please enter your base gross salary.');
-        return;
-      }
+      if (gross <= 0) { alert('Please enter your base gross salary.'); return; }
 
-      const hourlyRate = gross / norm;
+      const hourlyRate   = gross / norm;
+      const nightBonus   = Math.round(nightHours * hourlyRate * nightPct * 100) / 100;
+      const overtimeBonus= Math.round(overtimeHours * hourlyRate * overtimePct * 100) / 100;
+      const totalGross   = Math.round((gross + nightBonus + overtimeBonus) * 100) / 100;
 
-      const nightPct = (parseFloat(document.getElementById('procent-noapte').value) || 25) / 100;
-      const overtimePct = (parseFloat(document.getElementById('procent-extra').value) || 75) / 100;
-      const nightBonus = Math.round(nightHours * hourlyRate * nightPct * 100) / 100;
-      const overtimeBonus = Math.round(overtimeHours * hourlyRate * overtimePct * 100) / 100;
-      const totalGross = Math.round((gross + nightBonus + overtimeBonus) * 100) / 100;
+      const social       = Math.round(totalGross * pctSocial * 100) / 100;
+      const health       = Math.round(totalGross * pctHealth * 100) / 100;
+      const taxBase      = Math.max(0, totalGross - social - health);
+      const incomeTax    = Math.round(taxBase * pctTax * 100) / 100;
+      const net          = Math.round((totalGross - social - health - incomeTax) * 100) / 100;
 
-      const pension = Math.round(totalGross * 0.25 * 100) / 100;
-      const health  = Math.round(totalGross * 0.10 * 100) / 100;
-      const deduction = getDeduction(gross, dependants);
-      const taxBase = Math.max(0, totalGross - pension - health - deduction);
-      const incomeTax = Math.round(taxBase * 0.10 * 100) / 100;
-      const net = Math.round((totalGross - pension - health - incomeTax) * 100) / 100;
-
-      document.getElementById('results').style.display = 'block';
-
-      let infoText = `Hourly rate: ${hourlyRate.toFixed(2)} RON/h`;
-      if (nightHours > 0) infoText += ` · Night bonus: +${nightBonus} RON`;
-      if (overtimeHours > 0) infoText += ` · Overtime bonus: +${overtimeBonus} RON`;
+      let infoText = `Hourly rate: ${fmt(hourlyRate, currency)}`;
+      if (nightHours > 0)    infoText += ` · Night bonus: +${fmt(nightBonus, currency)}`;
+      if (overtimeHours > 0) infoText += ` · Overtime bonus: +${fmt(overtimeBonus, currency)}`;
       document.getElementById('info-box').textContent = infoText;
 
-      document.getElementById('result-grid').innerHTML = `
-        <div class="result-item highlight">
-          <div class="result-val">${net.toLocaleString('en-GB')} RON</div>
-          <div class="result-lbl">Net take-home salary</div>
-        </div>
-        <div class="result-item">
-          <div class="result-val">${totalGross.toLocaleString('en-GB')} RON</div>
-          <div class="result-lbl">Total gross (with bonuses)</div>
-        </div>
-        <div class="result-item">
-          <div class="result-val">${pension.toLocaleString('en-GB')} RON</div>
-          <div class="result-lbl">Pension — CAS (25%)</div>
-        </div>
-        <div class="result-item">
-          <div class="result-val">${health.toLocaleString('en-GB')} RON</div>
-          <div class="result-lbl">Health — CASS (10%)</div>
-        </div>
-        <div class="result-item">
-          <div class="result-val">${incomeTax.toLocaleString('en-GB')} RON</div>
-          <div class="result-lbl">Income tax (10%)</div>
-        </div>
-        <div class="result-item">
-          <div class="result-val">${deduction} RON</div>
-          <div class="result-lbl">Personal deduction</div>
-        </div>
-      `;
+      const rows = [
+        { val: fmt(net, currency),        lbl: 'Net take-home salary', hi: true },
+        { val: fmt(totalGross, currency), lbl: 'Total gross (with bonuses)' },
+        { val: fmt(social, currency),     lbl: `Social / Pension (${(pctSocial*100).toFixed(1)}%)` },
+        { val: fmt(health, currency),     lbl: `Health insurance (${(pctHealth*100).toFixed(1)}%)` },
+        { val: fmt(incomeTax, currency),  lbl: `Income tax (${(pctTax*100).toFixed(1)}%)` },
+      ];
 
+      document.getElementById('result-grid').innerHTML = rows.map(r =>
+        `<div class="result-item${r.hi ? ' highlight' : ''}">
+          <div class="result-val">${r.val}</div>
+          <div class="result-lbl">${r.lbl}</div>
+        </div>`
+      ).join('');
+
+      document.getElementById('results').style.display = 'block';
       document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
     }
   </script>
