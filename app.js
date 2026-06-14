@@ -10,7 +10,7 @@ const today = new Date();
 let viewYear  = today.getFullYear();
 let viewMonth = today.getMonth();
 let startDate = null;
-let filters   = { ort: true, iud: true, isl: true };
+let filters   = { ort: true, iud: true, isl: true, cat: true };
 let currentUser = null;
 
 let coDays = new Set();
@@ -236,6 +236,28 @@ const HOLIDAYS = {
   '2026-6-16': { name: 'Islamic New Year', type: 'isl' },
   '2026-6-25': { name: 'Ashura',           type: 'isl' },
   '2026-8-25': { name: 'Mawlid al-Nabi',   type: 'isl' },
+  // Catholic
+  '2026-1-1':  { name: "New Year's Day",   type: 'cat' },
+  '2026-1-6':  { name: 'Epiphany',         type: 'cat' },
+  '2026-2-2':  { name: 'Candlemas',        type: 'cat' },
+  '2026-2-14': { name: "Valentine's Day",  type: 'cat' },
+  '2026-3-19': { name: "St. Joseph's Day", type: 'cat' },
+  '2026-4-2':  { name: 'Holy Thursday',    type: 'cat' },
+  '2026-4-3':  { name: 'Good Friday',      type: 'cat' },
+  '2026-4-4':  { name: 'Holy Saturday',    type: 'cat' },
+  '2026-4-5':  { name: 'Easter Sunday',    type: 'cat' },
+  '2026-4-6':  { name: 'Easter Monday',    type: 'cat' },
+  '2026-5-14': { name: 'Ascension',        type: 'cat' },
+  '2026-5-24': { name: 'Pentecost Sunday', type: 'cat' },
+  '2026-5-25': { name: 'Pentecost Monday', type: 'cat' },
+  '2026-6-11': { name: 'Corpus Christi',   type: 'cat' },
+  '2026-8-15': { name: 'Assumption Day',   type: 'cat' },
+  '2026-11-1': { name: "All Saints' Day",  type: 'cat' },
+  '2026-11-2': { name: "All Souls' Day",   type: 'cat' },
+  '2026-12-8': { name: 'Immaculate Conception', type: 'cat' },
+  '2026-12-24':{ name: 'Christmas Eve',    type: 'cat' },
+  '2026-12-25':{ name: 'Christmas Day',    type: 'cat' },
+  '2026-12-26':{ name: 'St. Stephen\'s Day', type: 'cat' },
 };
 
 // ===== Utilities =====

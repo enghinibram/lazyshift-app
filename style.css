@@ -40,6 +40,7 @@
   --ort-bg:     #FEF3E2; --ort-text: #7A3B10; --ort-border: #F5A623;
   --iud-bg:     #F0EFFE; --iud-text: #3C3289; --iud-border: #A09BE8;
   --isl-bg:     #E3F6EE; --isl-text: #085041; --isl-border: #4DC9A0;
+  --cat-bg:     #E8F0FE; --cat-text: #1a3a8f; --cat-border: #4A80F0;
 }
 
 /* ===== DARK MODE ===== */
@@ -77,6 +78,7 @@
   --ort-bg:     #2e1f00; --ort-text: #f5a623; --ort-border: #7A3B10;
   --iud-bg:     #1a1530; --iud-text: #a09be8; --iud-border: #3C3289;
   --isl-bg:     #0a2018; --isl-text: #4DC9A0; --isl-border: #085041;
+  --cat-bg:     #0d1a3a; --cat-text: #7aaaf5; --cat-border: #1a3a8f;
 }
 
 body {
@@ -268,6 +270,7 @@ select:focus { outline: none; border-color: var(--accent); }
 .filter-btn.active-ort { background: var(--ort-bg); color: var(--ort-text); border-color: var(--ort-border); }
 .filter-btn.active-iud { background: var(--iud-bg); color: var(--iud-text); border-color: var(--iud-border); }
 .filter-btn.active-isl { background: var(--isl-bg); color: var(--isl-text); border-color: var(--isl-border); }
+.filter-btn.active-cat { background: var(--cat-bg); color: var(--cat-text); border-color: var(--cat-border); }
 
 /* ===== AL / SL Bar ===== */
 .co-cm-bar {
@@ -426,6 +429,7 @@ select:focus { outline: none; border-color: var(--accent); }
 .hol-ort   { color: var(--ort-text); }
 .hol-iud   { color: var(--iud-text); }
 .hol-isl   { color: var(--isl-text); }
+.hol-cat   { color: var(--cat-text); }
 .hol-legal { color: #fff; background: #c0392b; border-radius: 3px; padding: 0 2px; }
 .hol-co    { color: var(--co-text); background: var(--co-border); border-radius: 3px; padding: 0 2px; }
 .hol-cm    { color: #fff; background: var(--cm-border); border-radius: 3px; padding: 0 2px; }
@@ -449,6 +453,7 @@ select:focus { outline: none; border-color: var(--accent); }
 .leg-text.ort   { color: var(--ort-text); }
 .leg-text.iud   { color: var(--iud-text); }
 .leg-text.isl   { color: var(--isl-text); }
+.leg-text.cat   { color: var(--cat-text); }
 
 /* ===== Stats ===== */
 .stats {
