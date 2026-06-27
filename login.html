@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LazyShift — Sign in</title>
+  <meta name="theme-color" content="#0f0f0f" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0f0f0f;
+      --bg-card:  #1a1a1a;
+      --bg-input: #2a2a2a;
+      --border:   #333;
+      --text:     #e8e8e8;
+      --muted:    #aaa;
+      --hint:     #666;
+      --accent:   #4ade80;
+      --accent-dk:#22c55e;
+      --error:    #f87171;
+      --radius:   14px;
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .tagline {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0 14px;
+      gap: 10px;
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+    }
+    .input-wrap:focus-within { border-color: var(--accent); }
+    .input-wrap input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      color: var(--text);
+      padding: 14px 0;
+      outline: none;
+      font-family: inherit;
+    }
+    .input-wrap input::placeholder { color: var(--hint); }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:hover { background: var(--accent-dk); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn.loading .spinner { display: block; }
+    .btn.loading .btn-text { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      font-size: 13px;
+      color: var(--error);
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .error-msg.visible { display: block; }
+
+    /* Success state */
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 12px 0;
+    }
+    .success-state.visible { display: block; }
+    .success-icon { font-size: 52px; margin-bottom: 16px; }
+    .success-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .success-sub {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .success-sub strong { color: var(--accent); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+      color: var(--hint);
+      font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .trial-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(74,222,128,0.08);
+      border: 1px solid rgba(74,222,128,0.2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 20px;
+    }
+    .trial-icon { font-size: 20px; flex-shrink: 0; }
+    .trial-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .trial-text strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">LazyShift</div>
+  <div class="tagline">Shift work calculator</div>
+
+  <!-- LOGIN FORM -->
+  <div id="loginForm">
+    <h1>Sign in</h1>
+    <p class="subtitle">Enter your email — we'll send you a magic link. No password needed.</p>
+
+    <label for="emailInput">Email address</label>
+    <div class="input-wrap">
+      <input type="email" id="emailInput" placeholder="you@example.com"
+        autocomplete="email" inputmode="email" />
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <button class="btn" id="sendBtn" type="button">
+      <div class="spinner"></div>
+      <span class="btn-text">Send magic link</span>
+    </button>
+
+    <div class="trial-badge">
+      <div class="trial-icon">🎁</div>
+      <div class="trial-text">
+        First sign-in starts your <strong>30-day free trial</strong> — full access to the entire year, PDF export, and salary calculator.
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS STATE -->
+  <div class="success-state" id="successState">
+    <div class="success-icon">📬</div>
+    <div class="success-title">Check your email</div>
+    <p class="success-sub">
+      We sent a magic link to<br>
+      <strong id="sentToEmail"></strong><br><br>
+      Click the link in the email to sign in instantly. Check your spam folder if it doesn't arrive.
+    </p>
+    <button class="btn" onclick="resetForm()" style="background:var(--bg-input);color:var(--text);font-weight:600;">
+      ← Use a different email
+    </button>
+  </div>
+</div>
+
+<script>
+  // Replace these with your Supabase project values
+  const SUPABASE_URL      = 'https://gtgjwriutlyhvfoyucsq.supabase.co'
+  const SUPABASE_ANON_KEY = 'sb_publishable_X_FP_x4U_Fj54ImuOFXOGQ_V2x6iKOv'
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const { createClient } = window.supabase
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+  const emailInput = document.getElementById('emailInput')
+  const sendBtn    = document.getElementById('sendBtn')
+  const errorMsg   = document.getElementById('errorMsg')
+
+  // If user lands here with a magic link token → sign them in and redirect
+  ;(async () => {
+    const { data: { session } } = await sb.auth.getSession()
+    if (session) {
+      window.location.replace('index.html')
+      return
+    }
+
+    // Handle magic link redirect (token in URL hash)
+    const hash = window.location.hash
+    if (hash.includes('access_token')) {
+      const { error } = await sb.auth.getSession()
+      if (!error) {
+        window.location.replace('index.html')
+      }
+    }
+  })()
+
+  emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendLink() })
+
+  sendBtn.addEventListener('click', sendLink)
+
+  async function sendLink() {
+    const email = emailInput.value.trim()
+    hideError()
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError('Please enter a valid email address.')
+      return
+    }
+
+    setLoading(true)
+
+    const { error } = await sb.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin + '/login.html',
+        shouldCreateUser: true,
+      }
+    })
+
+    setLoading(false)
+
+    if (error) {
+      if (error.status === 429) {
+        showError('Too many attempts. Please wait a few minutes and try again.')
+      } else {
+        showError('Something went wrong. Check your connection and try again.')
+      }
+      return
+    }
+
+    document.getElementById('sentToEmail').textContent = email
+    document.getElementById('loginForm').style.display = 'none'
+    document.getElementById('successState').classList.add('visible')
+  }
+
+  function resetForm() {
+    document.getElementById('loginForm').style.display = 'block'
+    document.getElementById('successState').classList.remove('visible')
+    emailInput.value = ''
+    emailInput.focus()
+  }
+
+  function showError(msg) {
+    errorMsg.textContent = msg
+    errorMsg.classList.add('visible')
+  }
+  function hideError() {
+    errorMsg.classList.remove('visible')
+  }
+  function setLoading(on) {
+    sendBtn.disabled = on
+    sendBtn.classList.toggle('loading', on)
+  }
+
+  emailInput.focus()
+</script>
+</body>
+</html>

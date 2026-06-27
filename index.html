@@ -175,20 +175,37 @@
   })();
   </script>
 
-  <!-- ===== AUTH OVERLAY ===== -->
+  <!-- ===== AUTH OVERLAY (redirects to login.html) ===== -->
   <div id="auth-overlay" class="auth-overlay" style="display:none">
     <div class="auth-box" id="auth-box-inner">
+      <div style="font-size:40px; text-align:center; margin-bottom:12px;">🔐</div>
       <h2 class="auth-title">LazyShift</h2>
-      <p class="auth-sub">Sign in to save your shift pattern</p>
-      <div id="auth-error" class="auth-error" style="display:none"></div>
-      <input type="email" id="auth-email" placeholder="Email" class="auth-input" />
-      <input type="password" id="auth-pass" placeholder="Password" class="auth-input" />
-      <div style="text-align:right; margin-top:-4px;">
-        <button class="auth-btn ghost" style="font-size:11px; padding:0;" onclick="showResetPassword()">Forgot password?</button>
-      </div>
-      <button class="auth-btn" onclick="doLogin()">Sign in</button>
-      <button class="auth-btn secondary" onclick="doRegister()">Create account</button>
+      <p class="auth-sub">Sign in to save your schedule and unlock 30 days free.</p>
+      <a href="/login.html" class="auth-btn" style="text-decoration:none; text-align:center; display:block;">Sign in / Create account</a>
       <button class="auth-btn ghost" onclick="closeAuth()">Continue without account</button>
+    </div>
+  </div>
+
+  <!-- ===== UPGRADE OVERLAY ===== -->
+  <div id="upgrade-overlay" class="auth-overlay" style="display:none; z-index:10001;">
+    <div class="auth-box">
+      <div style="font-size:40px; text-align:center; margin-bottom:12px;">⚡</div>
+      <h2 class="auth-title" id="upgrade-title">Upgrade to Pro</h2>
+      <p class="auth-sub" id="upgrade-subtitle"></p>
+
+      <div style="background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2); border-radius:10px; padding:14px; margin-bottom:18px;">
+        <div style="font-size:13px; color:#e8e8e8; line-height:1.8;">
+          ✅ Full year calendar navigation<br>
+          ✅ Unlimited PDF exports<br>
+          ✅ Salary calculator<br>
+          ✅ Sync across devices
+        </div>
+      </div>
+
+      <a href="/login.html" class="auth-btn" style="text-decoration:none; text-align:center; display:block; background:#4ade80; color:#000;">
+        Start free trial (30 days)
+      </a>
+      <button class="auth-btn ghost" onclick="closeUpgradeOverlay()">Maybe later</button>
     </div>
   </div>
 
@@ -230,6 +247,13 @@
 
   <!-- ===== APP ===== -->
   <div class="wrap">
+    <!-- Trial banner -->
+    <div id="trial-banner" style="display:none; align-items:center; justify-content:space-between;
+      background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2);
+      border-radius:10px; padding:9px 14px; margin-bottom:10px;
+      font-size:13px; color:#aaa;">
+    </div>
+
     <div class="app-header">
       <h1>LazyShift</h1>
       <div class="header-actions">
@@ -427,6 +451,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
   <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
