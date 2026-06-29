@@ -17,24 +17,23 @@ const AUTH_SUPABASE_ANON_KEY = 'sb_publishable_X_FP_x4U_Fj54ImuOFXOGQ_V2x6iKOv'
 
     // ── Public API ──────────────────────────────────────────
 
-    getAccessLevel() {
-      if (!this.user) return { canAccessAll: false, isPro: false, isTrialActive: false, trialDaysLeft: 0, loggedIn: false }
-
+    getUserStatus() {
+      if (!this.user) return 'guest'
       const { is_pro, trial_ends_at } = this.profile || {}
-      if (is_pro) return { canAccessAll: true, isPro: true, isTrialActive: false, trialDaysLeft: 0, loggedIn: true }
+      if (is_pro) return 'pro'
+      if (trial_ends_at && new Date(trial_ends_at) > new Date()) return 'trial'
+      return 'expired'
+    },
 
-      const trialEnds = trial_ends_at ? new Date(trial_ends_at) : null
-      const now = new Date()
-      const isTrialActive = trialEnds && trialEnds > now
-      const trialDaysLeft = isTrialActive ? Math.ceil((trialEnds - now) / 86400000) : 0
-
-      return {
-        canAccessAll: isTrialActive,
-        isPro: false,
-        isTrialActive,
-        trialDaysLeft,
-        loggedIn: true,
+    getAccessLevel() {
+      const status = this.getUserStatus()
+      if (status === 'guest')   return { canAccessAll: false, isPro: false, isTrialActive: false, trialDaysLeft: 0, loggedIn: false }
+      if (status === 'pro')     return { canAccessAll: true,  isPro: true,  isTrialActive: false, trialDaysLeft: 0, loggedIn: true }
+      if (status === 'trial') {
+        const trialDaysLeft = Math.ceil((new Date(this.profile.trial_ends_at) - new Date()) / 86400000)
+        return { canAccessAll: true, isPro: false, isTrialActive: true, trialDaysLeft, loggedIn: true }
       }
+      return { canAccessAll: false, isPro: false, isTrialActive: false, trialDaysLeft: 0, loggedIn: true }
     },
 
     // Call before a premium action. If not allowed, shows the upgrade overlay.
