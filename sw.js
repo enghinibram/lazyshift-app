@@ -1,4 +1,4 @@
-const CACHE = 'lazyshift-v8';
+const CACHE = 'lazyshift-v9';
 const ASSETS = [
   '/',
   '/index.html',
