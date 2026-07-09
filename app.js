@@ -1,8 +1,8 @@
 // ===== Supabase Init =====
 const { createClient } = supabase;
 const sb = createClient(
-  'https://gtgjwriutlyhvfoyucsq.supabase.co',
-  'sb_publishable_X_FP_x4U_Fj54ImuOFXOGQ_V2x6iKOv'
+  'https://tmkrbnkztmohfoohbgfy.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRta3Jibmt6dG1vaGZvb2hiZ2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NzEwMDYsImV4cCI6MjA5NzA0NzAwNn0.3cs4A3nLk8jIEfo4byWpPiJrf59qnli1QiKeM7GiB8I'
 );
 
 // ===== State =====

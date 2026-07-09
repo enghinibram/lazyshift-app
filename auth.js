@@ -4,8 +4,8 @@
 // (must match what's in app.js and login.html)
 // ============================================================
 
-const AUTH_SUPABASE_URL      = 'https://gtgjwriutlyhvfoyucsq.supabase.co'
-const AUTH_SUPABASE_ANON_KEY = 'sb_publishable_X_FP_x4U_Fj54ImuOFXOGQ_V2x6iKOv'
+const AUTH_SUPABASE_URL      = 'https://tmkrbnkztmohfoohbgfy.supabase.co'
+const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRta3Jibmt6dG1vaGZvb2hiZ2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NzEwMDYsImV4cCI6MjA5NzA0NzAwNn0.3cs4A3nLk8jIEfo4byWpPiJrf59qnli1QiKeM7GiB8I'
 
 ;(function () {
   const { createClient } = window.supabase
