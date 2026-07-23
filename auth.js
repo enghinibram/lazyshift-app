@@ -162,7 +162,14 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
     const access = Auth.getAccessLevel()
 
     if (!access.loggedIn) {
-      banner.style.display = 'none'
+      banner.style.display = 'flex'
+      banner.style.background = 'rgba(74,222,128,0.05)'
+      banner.style.borderColor = 'rgba(74,222,128,0.15)'
+      banner.innerHTML = `
+        <span style="color:#7a9a7a;">📅 Sign in for a <strong style="color:#ccc;">30-day free trial</strong> — full year view, PDF exports, salary calculator.</span>
+        <a href="#" onclick="openAuth(); return false"
+           style="color:#4ade80; font-weight:700; text-decoration:none; font-size:12px; white-space:nowrap; margin-left:12px;">Sign in →</a>
+      `
       return
     }
 
@@ -197,6 +204,7 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
   document.addEventListener('DOMContentLoaded', () => {
     Auth.init()
     applyAccessRestrictions()
+    updateTrialBanner()
   })
 
 })()
