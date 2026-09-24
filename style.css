@@ -503,14 +503,6 @@ select:focus { outline: none; border-color: var(--accent); }
 .action-btn.pdf-btn:hover { background: #d0e8f8; }
 [data-theme="dark"] .action-btn.pdf-btn { background: var(--zi-bg); color: var(--zi-text); border-color: #1a4a6e; }
 
-.action-btn.coffee-btn {
-  background: #FFF3E0;
-  color: #7A4000;
-  border-color: #F5A623;
-}
-.action-btn.coffee-btn:hover { background: #ffe8c0; }
-[data-theme="dark"] .action-btn.coffee-btn { background: #2e1f00; color: #f5a623; border-color: #7A3B10; }
-
 /* ===== PWA Install Button ===== */
 .pwa-btn {
   display: block;
