@@ -155,11 +155,16 @@
         <label>Country preset</label>
         <select id="country" onchange="applyPreset()">
           <option value="ro">🇷🇴 Romania</option>
-          <option value="gb">🇬🇧 United Kingdom</option>
+          <option value="england">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</option>
+          <option value="scotland">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</option>
+          <option value="wales">🏴󠁧󠁢󠁷󠁬󠁳󠁿 Wales</option>
+          <option value="northern-ireland">🇬🇧 Northern Ireland</option>
           <option value="de">🇩🇪 Germany</option>
           <option value="fr">🇫🇷 France</option>
           <option value="it">🇮🇹 Italy</option>
           <option value="es">🇪🇸 Spain</option>
+          <option value="sweden">🇸🇪 Sweden</option>
+          <option value="finland">🇫🇮 Finland</option>
           <option value="us">🇺🇸 United States</option>
           <option value="other">🌍 Other / Custom</option>
         </select>
@@ -215,7 +220,16 @@
               <span class="pct-sym">%</span>
             </div>
           </div>
+          <div class="input-group" id="local-group" style="display:none">
+            <label id="local-label">Municipal tax</label>
+            <div class="pct-wrap">
+              <input type="number" id="pct-local" min="0" max="50" step="0.1" value="0" />
+              <span class="pct-sym">%</span>
+            </div>
+            <span class="note" id="local-note"></span>
+          </div>
         </div>
+        <span class="note" id="bands-note" style="display:none">Fields marked “progressive” use the country's tax bands, applied to your annualised pay (monthly × 12).</span>
         <span class="note">Presets are approximations. Always check your payslip or local tax authority for exact rates.</span>
       </div>
 
@@ -268,12 +282,12 @@
       <li>Add any <strong>night shift bonus</strong> and <strong>overtime bonus</strong> (calculated from your hourly rate)</li>
       <li>Deduct <strong>social/pension contribution</strong> (your share)</li>
       <li>Deduct <strong>health insurance</strong> (your share)</li>
-      <li>Apply <strong>income tax</strong> to the remaining amount</li>
+      <li>Apply <strong>income tax</strong> to the remaining amount — a flat rate, or progressive bands where the country uses them</li>
     </ol>
     <p>The result is your estimated <strong>net take-home salary</strong>.</p>
 
     <h2>Country preset rates</h2>
-    <p>Presets use approximate employee-portion rates for 2026. Employer contributions are not included (they don't affect your take-home). For countries with progressive tax (UK, Germany, USA), the preset uses the most common marginal rate for shift workers. Always verify with your payslip.</p>
+    <p>Presets use approximate employee-portion rates for 2026. Employer contributions are not included (they don't affect your take-home). For the UK nations, Germany and Finland the calculator applies the real progressive bands to your annualised pay (monthly × 12) and divides the result back to a monthly figure. Other countries use a single representative rate. Always verify with your payslip.</p>
 
     <div class="cta-box">
       <p>Track your shift schedule and monthly hours with <a href="/">LazyShift</a> — free.</p>
@@ -281,26 +295,109 @@
   </div>
 
   <script>
+    // Each rate field (social, health, tax) is either a flat % number or a
+    // progressive schedule applied to annualised pay (monthly × 12):
+    //   { bands: [[upTo, rate%], ...] }                — marginal bands, upTo = annual amount
+    //   { allowance, taperFrom, bands }                 — UK: bands apply to income above the
+    //                                                     personal allowance, which shrinks £1 per £2 over taperFrom
+    //   { formula: 'de2026' }                           — German §32a EStG tariff
+    // local: flat % (editable) on the tax base, e.g. municipal tax.
+    // deductContributions: false when social/health don't reduce the income-tax base.
+    const UK_NI = { bands: [[12570, 0], [50270, 8], [Infinity, 2]] };
+    const UK_RUK_TAX = { allowance: 12570, taperFrom: 100000,
+      bands: [[37700, 20], [125140, 40], [Infinity, 45]] };
+    const UK_SCOT_TAX = { allowance: 12570, taperFrom: 100000,
+      bands: [[3967, 19], [16956, 20], [31092, 21], [62430, 42], [125140, 45], [Infinity, 48]] };
+    const UK_RUK_NOTE = 'UK 2026: income tax 0% to £12,570, 20% to £50,270, 40% to £125,140, 45% above. NI 8% on £12,570–£50,270, 2% above.';
+
     const PRESETS = {
       ro:    { social: 25,   health: 10,  tax: 10,  currency: 'RON', norm: 160, note: 'Rates from Romanian law 2026: CAS 25%, CASS 10%, income tax 10%.' },
-      gb:    { social: 8,    health: 0,   tax: 20,  currency: 'GBP', norm: 160, note: 'UK 2026: NI 8% (employee), income tax 20% basic rate. Health included in NI.' },
-      de:    { social: 20.5, health: 7.3, tax: 14,  currency: 'EUR', norm: 168, note: 'Germany 2026: pension+unemployment ≈ 20.5%, health ≈ 7.3%, income tax from 14%.' },
+      england:            { social: UK_NI, health: 0, tax: UK_RUK_TAX,  deductContributions: false, currency: 'GBP', norm: 160, note: UK_RUK_NOTE },
+      wales:              { social: UK_NI, health: 0, tax: UK_RUK_TAX,  deductContributions: false, currency: 'GBP', norm: 160, note: UK_RUK_NOTE },
+      'northern-ireland': { social: UK_NI, health: 0, tax: UK_RUK_TAX,  deductContributions: false, currency: 'GBP', norm: 160, note: UK_RUK_NOTE },
+      scotland:           { social: UK_NI, health: 0, tax: UK_SCOT_TAX, deductContributions: false, currency: 'GBP', norm: 160, note: 'Scotland 2026: income tax 19% / 20% / 21% / 42% / 45% / 48% bands above the £12,570 allowance. NI 8% on £12,570–£50,270, 2% above.' },
+      de:    { social: 10.6, health: 10.75, tax: { formula: 'de2026' }, currency: 'EUR', norm: 168, note: 'Germany 2026: pension 9.3% + unemployment 1.3%, health 8.75% + care ≈2%. Income tax progressive: 0% to €12,348, 14%→42% up to €69,878, 42% to €277,825, 45% above.' },
       fr:    { social: 22,   health: 0,   tax: 11,  currency: 'EUR', norm: 151, note: 'France 2026: employee charges ≈ 22%, income tax 11% (2nd bracket). Health included.' },
       it:    { social: 9.19, health: 0,   tax: 23,  currency: 'EUR', norm: 160, note: 'Italy 2026: INPS employee ≈ 9.19%, IRPEF 23% first bracket.' },
       es:    { social: 6.35, health: 0,   tax: 19,  currency: 'EUR', norm: 160, note: 'Spain 2026: employee SS ≈ 6.35%, income tax 19% (first bracket).' },
+      sweden:  { social: 0,  health: 0,   tax: 0, local: 26, localLabel: 'Municipal tax',
+                 localNote: 'Approximate effective rate after the basic deduction — edit to match your payslip.',
+                 currency: 'SEK', norm: 160, note: 'Sweden 2026: effective municipal tax ≈ 26% for average shift-worker pay (approximate, editable). Social contributions are paid by the employer.' },
+      finland: { social: 8.19, health: 0, local: 7.5, localLabel: 'Municipal tax',
+                 tax: { bands: [[20500, 0], [30500, 6], [50400, 17.25], [88200, 21.25], [Infinity, 31.25]] },
+                 currency: 'EUR', norm: 160, note: 'Finland: TyEL pension 7.3% + unemployment 0.89%. State tax 2026 progressive 0%→31.25%, plus municipal tax (≈7.5%, edit for your municipality).' },
       us:    { social: 6.2,  health: 1.45,tax: 22,  currency: 'USD', norm: 160, note: 'USA 2026: Social Security 6.2%, Medicare 1.45%, federal income tax 22% bracket.' },
       other: { social: 0,    health: 0,   tax: 0,   currency: 'EUR', norm: 160, note: 'Enter your own rates below.' },
     };
 
+    const RATE_FIELDS = [['social', 'pct-social'], ['health', 'pct-health'], ['tax', 'pct-tax']];
+
     function applyPreset() {
       const p = PRESETS[document.getElementById('country').value];
-      document.getElementById('pct-social').value  = p.social;
-      document.getElementById('pct-health').value  = p.health;
-      document.getElementById('pct-tax').value     = p.tax;
+      let anyProgressive = false;
+      RATE_FIELDS.forEach(([key, id]) => {
+        const input = document.getElementById(id);
+        const progressive = typeof p[key] === 'object';
+        anyProgressive = anyProgressive || progressive;
+        input.disabled    = progressive;
+        input.value       = progressive ? '' : p[key];
+        input.placeholder = progressive ? 'progressive' : '';
+      });
+      const hasLocal = p.local !== undefined;
+      document.getElementById('local-group').style.display = hasLocal ? '' : 'none';
+      document.getElementById('pct-local').value = hasLocal ? p.local : 0;
+      if (hasLocal) document.getElementById('local-label').textContent = p.localLabel;
+      document.getElementById('local-note').textContent = p.localNote || '';
+      document.getElementById('bands-note').style.display = anyProgressive ? '' : 'none';
       document.getElementById('currency').value    = p.currency;
       document.getElementById('norma').value       = p.norm;
       document.getElementById('preset-note').textContent = p.note;
       document.getElementById('results').style.display = 'none';
+    }
+
+    function round2(x) { return Math.round(x * 100) / 100; }
+
+    // Marginal tax on an annual amount; bands = [[upTo, rate%], ...] in ascending order.
+    function bandTax(annual, bands) {
+      let tax = 0, prev = 0;
+      for (const [upTo, rate] of bands) {
+        if (annual <= prev) break;
+        tax += (Math.min(annual, upTo) - prev) * rate / 100;
+        prev = upTo;
+      }
+      return tax;
+    }
+
+    // German income tax 2026, §32a EStG (single filer), on annual taxable income.
+    function deIncomeTax2026(income) {
+      const x = Math.floor(income);
+      if (x <= 12348) return 0;
+      if (x <= 17799) { const y = (x - 12348) / 10000; return Math.floor((914.51 * y + 1400) * y); }
+      if (x <= 69878) { const z = (x - 17799) / 10000; return Math.floor((173.10 * z + 2397) * z + 1034.87); }
+      if (x <= 277825) return Math.floor(0.42 * x - 11135.63);
+      return Math.floor(0.45 * x - 19470.38);
+    }
+
+    const TAX_FORMULAS = { de2026: deIncomeTax2026 };
+
+    // Annual amount owed on an annual base, for a progressive schedule.
+    function progressiveAnnual(annual, spec) {
+      if (spec.formula) return TAX_FORMULAS[spec.formula](annual);
+      if (spec.allowance !== undefined) {
+        const allowance = Math.max(0, spec.allowance - Math.max(0, annual - spec.taperFrom) / 2);
+        return bandTax(Math.max(0, annual - allowance), spec.bands);
+      }
+      return bandTax(annual, spec.bands);
+    }
+
+    // Monthly amount for one rate field: flat % from the input, or the preset's progressive schedule.
+    function monthlyAmount(monthlyBase, preset, key, inputId) {
+      if (typeof preset[key] === 'object') {
+        const amount = round2(progressiveAnnual(monthlyBase * 12, preset[key]) / 12);
+        return { amount, label: `effective ${monthlyBase > 0 ? (amount / monthlyBase * 100).toFixed(1) : '0.0'}%` };
+      }
+      const pct = (parseFloat(document.getElementById(inputId).value) || 0) / 100;
+      return { amount: round2(monthlyBase * pct), label: `${(pct * 100).toFixed(1)}%` };
     }
 
     function fmt(val, currency) {
@@ -308,29 +405,31 @@
     }
 
     function calculate() {
+      const preset       = PRESETS[document.getElementById('country').value];
       const gross        = parseFloat(document.getElementById('brut').value) || 0;
       const norm         = parseFloat(document.getElementById('norma').value) || 160;
       const nightHours   = parseFloat(document.getElementById('ore-noapte').value) || 0;
       const overtimeHours= parseFloat(document.getElementById('ore-extra').value) || 0;
       const nightPct     = (parseFloat(document.getElementById('procent-noapte').value) || 0) / 100;
       const overtimePct  = (parseFloat(document.getElementById('procent-extra').value) || 0) / 100;
-      const pctSocial    = (parseFloat(document.getElementById('pct-social').value) || 0) / 100;
-      const pctHealth    = (parseFloat(document.getElementById('pct-health').value) || 0) / 100;
-      const pctTax       = (parseFloat(document.getElementById('pct-tax').value) || 0) / 100;
+      const pctLocal     = preset.local !== undefined ? (parseFloat(document.getElementById('pct-local').value) || 0) / 100 : 0;
       const currency     = document.getElementById('currency').value;
 
       if (gross <= 0) { alert('Please enter your base gross salary.'); return; }
 
       const hourlyRate   = gross / norm;
-      const nightBonus   = Math.round(nightHours * hourlyRate * nightPct * 100) / 100;
-      const overtimeBonus= Math.round(overtimeHours * hourlyRate * overtimePct * 100) / 100;
-      const totalGross   = Math.round((gross + nightBonus + overtimeBonus) * 100) / 100;
+      const nightBonus   = round2(nightHours * hourlyRate * nightPct);
+      const overtimeBonus= round2(overtimeHours * hourlyRate * overtimePct);
+      const totalGross   = round2(gross + nightBonus + overtimeBonus);
 
-      const social       = Math.round(totalGross * pctSocial * 100) / 100;
-      const health       = Math.round(totalGross * pctHealth * 100) / 100;
-      const taxBase      = Math.max(0, totalGross - social - health);
-      const incomeTax    = Math.round(taxBase * pctTax * 100) / 100;
-      const net          = Math.round((totalGross - social - health - incomeTax) * 100) / 100;
+      const social       = monthlyAmount(totalGross, preset, 'social', 'pct-social');
+      const health       = monthlyAmount(totalGross, preset, 'health', 'pct-health');
+      const taxBase      = preset.deductContributions === false
+        ? totalGross
+        : Math.max(0, totalGross - social.amount - health.amount);
+      const incomeTax    = monthlyAmount(taxBase, preset, 'tax', 'pct-tax');
+      const localTax     = round2(taxBase * pctLocal);
+      const net          = round2(totalGross - social.amount - health.amount - incomeTax.amount - localTax);
 
       let infoText = `Hourly rate: ${fmt(hourlyRate, currency)}`;
       if (nightHours > 0)    infoText += ` · Night bonus: +${fmt(nightBonus, currency)}`;
@@ -338,12 +437,15 @@
       document.getElementById('info-box').textContent = infoText;
 
       const rows = [
-        { val: fmt(net, currency),        lbl: 'Net take-home salary', hi: true },
-        { val: fmt(totalGross, currency), lbl: 'Total gross (with bonuses)' },
-        { val: fmt(social, currency),     lbl: `Social / Pension (${(pctSocial*100).toFixed(1)}%)` },
-        { val: fmt(health, currency),     lbl: `Health insurance (${(pctHealth*100).toFixed(1)}%)` },
-        { val: fmt(incomeTax, currency),  lbl: `Income tax (${(pctTax*100).toFixed(1)}%)` },
+        { val: fmt(net, currency),              lbl: 'Net take-home salary', hi: true },
+        { val: fmt(totalGross, currency),       lbl: 'Total gross (with bonuses)' },
+        { val: fmt(social.amount, currency),    lbl: `Social / Pension (${social.label})` },
+        { val: fmt(health.amount, currency),    lbl: `Health insurance (${health.label})` },
+        { val: fmt(incomeTax.amount, currency), lbl: `Income tax (${incomeTax.label})` },
       ];
+      if (preset.local !== undefined) {
+        rows.push({ val: fmt(localTax, currency), lbl: `${preset.localLabel} (${(pctLocal * 100).toFixed(1)}%)` });
+      }
 
       document.getElementById('result-grid').innerHTML = rows.map(r =>
         `<div class="result-item${r.hi ? ' highlight' : ''}">
