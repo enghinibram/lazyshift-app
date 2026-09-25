@@ -935,6 +935,13 @@ function showPushStatus(msg, type) {
   el.style.display = 'block';
 }
 
+// VAPID public key — hardcoded because app.lazyshift.com is served by
+// GitHub Pages, where /api (Vercel functions) doesn't exist. It's public
+// by design (every subscribing browser receives it). If the key pair is
+// ever rotated, update it here AND in the Supabase secrets
+// (VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY) at the same time.
+const VAPID_PUBLIC_KEY = 'BP--z0JNGjWV_2gk3RJK2GMQ_Bs82dJPQFBvcmxZw2MTjx83UfRATcs9kW58w3bAiuvQOLYuqIgqwtRLKp1pPgw';
+
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -973,13 +980,9 @@ async function activatePush() {
 
     const reg = await navigator.serviceWorker.ready;
 
-    const keyRes = await fetch('/api/vapid-public-key');
-    if (!keyRes.ok) throw new Error('Could not fetch the VAPID key.');
-    const { publicKey } = await keyRes.json();
-
     const subscription = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey),
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     });
 
     const raw = subscription.toJSON();
