@@ -317,14 +317,17 @@ async function saveSettings() {
   const startStr = startDate
     ? `${startDate.getFullYear()}-${String(startDate.getMonth()+1).padStart(2,'0')}-${String(startDate.getDate()).padStart(2,'0')}`
     : null;
+  const shiftStartInput = document.getElementById('shift-start-time');
+  const shiftStartTime = shiftStartInput && shiftStartInput.value ? shiftStartInput.value : null;
   await sb.from('user_settings').upsert({
-    user_id:     currentUser.id,
-    start_date:  startStr,
-    tura_type:   shiftType,
-    co_days:     serializeSet(coDays),
-    cm_days:     serializeSet(cmDays),
-    custom_days: serializeSet(customDays),
-    custom_ore:  getCustomOre(),
+    user_id:          currentUser.id,
+    start_date:       startStr,
+    tura_type:        shiftType,
+    co_days:          serializeSet(coDays),
+    cm_days:          serializeSet(cmDays),
+    custom_days:      serializeSet(customDays),
+    custom_ore:       getCustomOre(),
+    shift_start_time: shiftStartTime,
   }, { onConflict: 'user_id' });
 }
 
@@ -355,6 +358,10 @@ async function loadSettings() {
     if (data.custom_ore) {
       const inp = document.getElementById('custom-hours-input');
       if (inp) inp.value = data.custom_ore;
+    }
+    if (data.shift_start_time) {
+      const inp = document.getElementById('shift-start-time');
+      if (inp) inp.value = data.shift_start_time.slice(0, 5); // "HH:MM:SS" -> "HH:MM"
     }
   }
   recalc();
@@ -673,6 +680,10 @@ document.addEventListener('DOMContentLoaded', () => {
       saveSettings();
     });
   }
+  const shiftStartInput = document.getElementById('shift-start-time');
+  if (shiftStartInput) {
+    shiftStartInput.addEventListener('change', () => saveSettings());
+  }
 });
 
 // ===== PWA Install =====
@@ -868,6 +879,7 @@ function updateUserBar(user) {
     notice.style.display  = 'none';
     prevBtn.disabled = false;
     nextBtn.disabled = false;
+    updatePushSettingsUI();
   } else {
     currentUser = null;
     btn.textContent = 'Sign in';
@@ -878,6 +890,7 @@ function updateUserBar(user) {
     notice.style.display  = 'none';
     prevBtn.disabled = false;
     nextBtn.disabled = false;
+    updatePushSettingsUI();
     recalc();
   }
 }
@@ -888,6 +901,119 @@ sb.auth.onAuthStateChange(async (event, session) => {
   updateUserBar(user);
   if (user) await loadSettings();
 });
+
+// ===== Push notifications (shift reminder, trial + Pro) =====
+// Eligibility comes from auth.js (Auth.getAccessLevel): logged in AND
+// (Pro OR active trial) — same rule as the send-shift-reminders Edge
+// Function, which only sends to is_pro / trial_ends_at in the future.
+function isPushEligible() {
+  if (!currentUser || !window.Auth) return false;
+  const access = Auth.getAccessLevel();
+  return access.loggedIn && access.canAccessAll;
+}
+
+// Called by auth.js after the profile loads / on sign-out, since access
+// level is only known once public.users has been read.
+function updatePushSettingsUI() {
+  const box = document.getElementById('push-settings');
+  if (box) box.style.display = isPushEligible() ? 'block' : 'none';
+}
+
+function isIOSDevice() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function isStandalonePWA() {
+  return window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+}
+
+function showPushStatus(msg, type) {
+  const el = document.getElementById('push-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'push-status' + (type ? ' ' + type : '');
+  el.style.display = 'block';
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; i++) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+async function activatePush() {
+  if (!isPushEligible()) return;
+
+  // iOS Safari only supports push from a PWA installed on the home
+  // screen (iOS 16.4+) — from a normal tab, requestPermission fails silently.
+  if (isIOSDevice() && !isStandalonePWA()) {
+    showPushStatus('On iPhone/iPad, notifications only work from the app installed on your home screen (iOS 16.4+). Install it, then come back here.', 'error');
+    openPwaModal();
+    return;
+  }
+
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    showPushStatus('Your browser does not support push notifications.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('push-activate-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Enabling...'; }
+
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      showPushStatus('You blocked notifications. You can enable them anytime from your browser settings.', 'error');
+      if (btn) { btn.disabled = false; btn.textContent = 'Enable notifications'; }
+      return;
+    }
+
+    const reg = await navigator.serviceWorker.ready;
+
+    const keyRes = await fetch('/api/vapid-public-key');
+    if (!keyRes.ok) throw new Error('Could not fetch the VAPID key.');
+    const { publicKey } = await keyRes.json();
+
+    const subscription = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
+
+    const raw = subscription.toJSON();
+    const { error } = await sb.from('push_subscriptions').upsert({
+      user_id:  currentUser.id,
+      endpoint: raw.endpoint,
+      p256dh:   raw.keys.p256dh,
+      auth_key: raw.keys.auth,
+    }, { onConflict: 'user_id,endpoint' });
+    if (error) throw error;
+
+    // Reminders are computed in the user's own timezone — save it
+    // automatically from the device, no manual input.
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const { error: tzError } = await sb.from('user_settings').upsert({
+      user_id: currentUser.id,
+      timezone,
+    }, { onConflict: 'user_id' });
+    if (tzError) throw tzError;
+
+    const hasStartTime = !!document.getElementById('shift-start-time')?.value;
+    showPushStatus(
+      hasStartTime
+        ? "✓ Notifications enabled! We'll remind you before your shift."
+        : '✓ Notifications enabled! Set your shift start time above so we know when to remind you.',
+      'success'
+    );
+    if (btn) btn.textContent = '✓ Notifications on';
+  } catch (err) {
+    console.error('Push activation error:', err);
+    showPushStatus('Something went wrong while enabling notifications. Please try again.', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = 'Enable notifications'; }
+  }
+}
 
 // ===== Init =====
 (function checkPasswordReset() {

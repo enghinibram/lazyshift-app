@@ -363,6 +363,20 @@
       <div class="stat"><div class="stat-val" id="ore-extra">—</div><div class="stat-lbl">extra / minus hours</div></div>
     </div>
 
+    <!-- ===== SHIFT REMINDERS (trial + Pro) ===== -->
+    <div id="push-settings" class="push-settings" style="display:none">
+      <p class="push-settings-title">🔔 Shift reminder</p>
+      <p class="push-settings-sub">Get a notification on your phone 2-3 hours before your shift starts.</p>
+
+      <div class="push-settings-row">
+        <label for="shift-start-time">Shift start time</label>
+        <input type="time" id="shift-start-time" />
+      </div>
+
+      <button id="push-activate-btn" class="push-activate-btn" onclick="activatePush()">Enable notifications</button>
+      <p id="push-status" class="push-status" style="display:none"></p>
+    </div>
+
     <!-- ===== ACTION BUTTONS ===== -->
     <div id="action-buttons" class="action-buttons">
       <button class="action-btn print-btn" onclick="doPrint()" title="Print calendar">

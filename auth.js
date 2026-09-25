@@ -72,6 +72,7 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
       this.profile = await this._getOrCreateProfile(user)
       applyAccessRestrictions()
       updateTrialBanner()
+      if (typeof window.updatePushSettingsUI === 'function') window.updatePushSettingsUI()
     },
 
     _onSignOut() {
@@ -79,6 +80,7 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
       this.profile = null
       applyAccessRestrictions()
       updateTrialBanner()
+      if (typeof window.updatePushSettingsUI === 'function') window.updatePushSettingsUI()
     },
 
     init() {

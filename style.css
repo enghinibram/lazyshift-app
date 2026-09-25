@@ -697,3 +697,57 @@ select:focus { outline: none; border-color: var(--accent); }
 .article-links li { margin-bottom: 0.4rem; }
 .article-links a { color: var(--accent); text-decoration: none; font-size: 13px; }
 .article-links a:hover { text-decoration: underline; }
+
+/* ===== Shift reminders (push, trial + Pro) ===== */
+.push-settings {
+  margin-top: 1.25rem;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--bg-stat);
+  border: 1px solid var(--accent);
+}
+.push-settings-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+.push-settings-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.push-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.push-settings-row label { font-size: 13px; color: var(--text-main); }
+.push-settings-row input[type="time"] {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-main);
+  font-size: 14px;
+}
+.push-activate-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.push-activate-btn:hover { background: var(--accent-dk); }
+.push-activate-btn:disabled { opacity: 0.6; cursor: default; }
+.push-status { font-size: 12px; margin-top: 8px; color: var(--text-muted); }
+.push-status.error { color: #e53e3e; }
+.push-status.success { color: var(--accent); }
