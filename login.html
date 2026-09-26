@@ -189,6 +189,53 @@
     .trial-icon { font-size: 20px; flex-shrink: 0; }
     .trial-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
     .trial-text strong { color: var(--accent); }
+    /* Sign in / Create account tabs */
+    .tabs {
+      display: flex;
+      background: var(--bg-input);
+      border-radius: var(--radius);
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .tab.active { background: var(--bg-card); color: var(--text); }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: underline;
+      font-family: inherit;
+      padding: 0;
+    }
+    .link-btn:hover { color: var(--text); }
+    .form-links {
+      display: flex;
+      justify-content: flex-end;
+      margin: -12px 0 20px;
+    }
+    .center-link { display: block; margin: 16px auto 0; }
+    .hint {
+      font-size: 12px;
+      color: var(--hint);
+      line-height: 1.5;
+      margin-top: 14px;
+      text-align: center;
+    }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
@@ -196,43 +243,103 @@
   <div class="logo">LazyShift</div>
   <div class="tagline">Shift work calculator</div>
 
-  <!-- LOGIN FORM -->
-  <div id="loginForm">
-    <h1>Sign in</h1>
-    <p class="subtitle">Enter your email — we'll send you a magic link. No password needed.</p>
+  <!-- SIGN IN / CREATE ACCOUNT -->
+  <form id="authForm" novalidate>
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab active" id="tabSignin" role="tab" aria-selected="true">Sign in</button>
+      <button type="button" class="tab" id="tabSignup" role="tab" aria-selected="false">Create account</button>
+    </div>
+
+    <h1 id="formTitle">Welcome back</h1>
+    <p class="subtitle" id="formSubtitle">Sign in with your email and password.</p>
 
     <label for="emailInput">Email address</label>
     <div class="input-wrap">
       <input type="email" id="emailInput" placeholder="you@example.com"
-        autocomplete="email" inputmode="email" />
+        autocomplete="email" inputmode="email" required />
+    </div>
+
+    <label for="passwordInput">Password</label>
+    <div class="input-wrap">
+      <input type="password" id="passwordInput" placeholder="Your password"
+        autocomplete="current-password" minlength="6" required />
+    </div>
+
+    <div class="form-links" id="forgotWrap">
+      <button type="button" class="link-btn" id="forgotLink">Forgot password?</button>
     </div>
 
     <div class="error-msg" id="errorMsg"></div>
 
-    <button class="btn" id="sendBtn" type="button">
+    <button class="btn" id="submitBtn" type="submit">
       <div class="spinner"></div>
-      <span class="btn-text">Send magic link</span>
+      <span class="btn-text" id="submitText">Sign in</span>
     </button>
 
-    <div class="trial-badge">
+    <button type="button" class="link-btn center-link" id="resendLink" hidden>Resend verification email</button>
+
+    <p class="hint" id="legacyHint">Used a magic link before? Your account has no password yet — tap <strong>Forgot password?</strong> to set one.</p>
+
+    <div class="trial-badge" id="trialBadge" hidden>
       <div class="trial-icon">🎁</div>
       <div class="trial-text">
-        First sign-in starts your <strong>30-day free trial</strong> — full access to the entire year, PDF export, and salary calculator.
+        Your account starts with a <strong>30-day free trial</strong> — full access to the entire year, PDF export, and salary calculator.
       </div>
     </div>
-  </div>
+  </form>
 
-  <!-- SUCCESS STATE -->
-  <div class="success-state" id="successState">
-    <div class="success-icon">📬</div>
-    <div class="success-title">Check your email</div>
-    <p class="success-sub">
-      We sent a magic link to<br>
-      <strong id="sentToEmail"></strong><br><br>
-      Click the link in the email to sign in instantly. Check your spam folder if it doesn't arrive.
-    </p>
-    <button class="btn" onclick="resetForm()" style="background:var(--bg-input);color:var(--text);font-weight:600;">
-      ← Use a different email
+  <!-- FORGOT PASSWORD -->
+  <form id="forgotForm" novalidate hidden>
+    <h1>Reset password</h1>
+    <p class="subtitle">Enter the email you registered with and we'll send you a link to set a new password.</p>
+
+    <label for="forgotEmail">Email address</label>
+    <div class="input-wrap">
+      <input type="email" id="forgotEmail" placeholder="you@example.com"
+        autocomplete="email" inputmode="email" required />
+    </div>
+
+    <div class="error-msg" id="forgotError"></div>
+
+    <button class="btn" id="forgotBtn" type="submit">
+      <div class="spinner"></div>
+      <span class="btn-text">Send reset link</span>
+    </button>
+    <button type="button" class="link-btn center-link" id="backToSignin">← Back to sign in</button>
+  </form>
+
+  <!-- NEW PASSWORD (after clicking the reset link) -->
+  <form id="newPassForm" novalidate hidden>
+    <h1>Choose a new password</h1>
+    <p class="subtitle">You'll use it to sign in from now on.</p>
+
+    <label for="newPass1">New password</label>
+    <div class="input-wrap">
+      <input type="password" id="newPass1" placeholder="At least 6 characters"
+        autocomplete="new-password" minlength="6" required />
+    </div>
+
+    <label for="newPass2">Confirm password</label>
+    <div class="input-wrap">
+      <input type="password" id="newPass2" placeholder="Repeat the password"
+        autocomplete="new-password" minlength="6" required />
+    </div>
+
+    <div class="error-msg" id="newPassError"></div>
+
+    <button class="btn" id="newPassBtn" type="submit">
+      <div class="spinner"></div>
+      <span class="btn-text">Save password</span>
+    </button>
+  </form>
+
+  <!-- MESSAGE STATE (check your email / done) -->
+  <div class="success-state" id="messageState">
+    <div class="success-icon" id="messageIcon">📬</div>
+    <div class="success-title" id="messageTitle">Check your email</div>
+    <p class="success-sub" id="messageBody"></p>
+    <button class="btn" id="messageBtn" type="button" style="background:var(--bg-input);color:var(--text);font-weight:600;">
+      ← Back to sign in
     </button>
   </div>
 </div>
@@ -244,90 +351,245 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // Read before createClient: supabase-js parses and clears the URL hash
+  // during init. A password-reset link lands here with type=recovery and
+  // must show the "new password" form instead of redirecting to the app.
+  const IS_RECOVERY = window.location.hash.includes('type=recovery')
+
   const { createClient } = window.supabase
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-  const emailInput = document.getElementById('emailInput')
-  const sendBtn    = document.getElementById('sendBtn')
-  const errorMsg   = document.getElementById('errorMsg')
+  // Links in Supabase emails (signup verification + password reset) come
+  // back to this page; the URL must be in Auth → URL Configuration →
+  // Redirect URLs (it already is — the old magic link used it too).
+  const REDIRECT_URL = window.location.origin + '/login.html'
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const MIN_PASSWORD = 6
 
-  // If user lands here with a magic link token → sign them in and redirect
+  const $ = id => document.getElementById(id)
+  const authForm    = $('authForm')
+  const forgotForm  = $('forgotForm')
+  const newPassForm = $('newPassForm')
+  const emailInput  = $('emailInput')
+  const passInput   = $('passwordInput')
+
+  let mode = 'signin' // 'signin' | 'signup'
+  let lastUnconfirmedEmail = null
+
+  // ── Session on load ─────────────────────────────────────────
+  // Already signed in (incl. arriving from the signup verification link,
+  // which creates the session) → go to the app. Recovery links also
+  // create a session, but the user must set a password first.
   ;(async () => {
+    if (IS_RECOVERY) { showView('newpass'); return }
     const { data: { session } } = await sb.auth.getSession()
-    if (session) {
-      window.location.replace('index.html')
-      return
-    }
-
-    // Handle magic link redirect (token in URL hash)
-    const hash = window.location.hash
-    if (hash.includes('access_token')) {
-      const { error } = await sb.auth.getSession()
-      if (!error) {
-        window.location.replace('index.html')
-      }
-    }
+    if (session) window.location.replace('index.html')
   })()
 
-  emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendLink() })
+  sb.auth.onAuthStateChange((event) => {
+    if (event === 'PASSWORD_RECOVERY') showView('newpass')
+  })
 
-  sendBtn.addEventListener('click', sendLink)
+  // ── Views ───────────────────────────────────────────────────
+  function showView(view) {
+    authForm.hidden    = view !== 'auth'
+    forgotForm.hidden  = view !== 'forgot'
+    newPassForm.hidden = view !== 'newpass'
+    $('messageState').classList.toggle('visible', view === 'message')
+    const focus = { auth: emailInput, forgot: $('forgotEmail'), newpass: $('newPass1') }[view]
+    if (focus) focus.focus()
+  }
 
-  async function sendLink() {
-    const email = emailInput.value.trim()
-    hideError()
+  function showMessage(icon, title, bodyHtml, btnText, onBtn) {
+    $('messageIcon').textContent  = icon
+    $('messageTitle').textContent = title
+    $('messageBody').innerHTML    = bodyHtml
+    $('messageBtn').textContent   = btnText
+    $('messageBtn').onclick       = onBtn
+    showView('message')
+  }
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showError('Please enter a valid email address.')
-      return
+  function setMode(next) {
+    mode = next
+    const signup = mode === 'signup'
+    $('tabSignin').classList.toggle('active', !signup)
+    $('tabSignup').classList.toggle('active', signup)
+    $('tabSignin').setAttribute('aria-selected', String(!signup))
+    $('tabSignup').setAttribute('aria-selected', String(signup))
+    $('formTitle').textContent    = signup ? 'Create your account' : 'Welcome back'
+    $('formSubtitle').textContent = signup
+      ? "Choose an email and password. We'll send you one email to verify your address."
+      : 'Sign in with your email and password.'
+    $('submitText').textContent = signup ? 'Create account' : 'Sign in'
+    passInput.placeholder  = signup ? 'At least 6 characters' : 'Your password'
+    passInput.autocomplete = signup ? 'new-password' : 'current-password'
+    $('forgotWrap').hidden = signup
+    $('legacyHint').hidden = signup
+    $('trialBadge').hidden = !signup
+    $('resendLink').hidden = true
+    hideError('errorMsg')
+  }
+
+  $('tabSignin').addEventListener('click', () => setMode('signin'))
+  $('tabSignup').addEventListener('click', () => setMode('signup'))
+  $('forgotLink').addEventListener('click', () => {
+    $('forgotEmail').value = emailInput.value.trim()
+    hideError('forgotError')
+    showView('forgot')
+  })
+  $('backToSignin').addEventListener('click', () => showView('auth'))
+
+  // ── Sign in / Sign up ───────────────────────────────────────
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    hideError('errorMsg')
+    $('resendLink').hidden = true
+
+    const email    = emailInput.value.trim()
+    const password = passInput.value
+
+    if (!EMAIL_RE.test(email)) return showError('errorMsg', 'Please enter a valid email address.')
+    if (!password) return showError('errorMsg', 'Please enter your password.')
+    if (mode === 'signup' && password.length < MIN_PASSWORD) {
+      return showError('errorMsg', `Password must be at least ${MIN_PASSWORD} characters.`)
     }
 
-    setLoading(true)
+    setLoading('submitBtn', true)
+    if (mode === 'signin') await signIn(email, password)
+    else                   await signUp(email, password)
+    setLoading('submitBtn', false)
+  })
 
-    const { error } = await sb.auth.signInWithOtp({
+  async function signIn(email, password) {
+    const { error } = await sb.auth.signInWithPassword({ email, password })
+    if (!error) { window.location.replace('index.html'); return }
+
+    if (error.code === 'email_not_confirmed') {
+      lastUnconfirmedEmail = email
+      $('resendLink').hidden = false
+      return showError('errorMsg', 'Please verify your email first — check your inbox for the verification link.')
+    }
+    if (error.code === 'invalid_credentials') {
+      return showError('errorMsg', 'Incorrect email or password. If you used a magic link before, use "Forgot password?" to set a password.')
+    }
+    showError('errorMsg', rateLimitOr(error, 'Something went wrong. Check your connection and try again.'))
+  }
+
+  async function signUp(email, password) {
+    const { data, error } = await sb.auth.signUp({
       email,
-      options: {
-        emailRedirectTo: window.location.origin + '/login.html',
-        shouldCreateUser: true,
-      }
+      password,
+      options: { emailRedirectTo: REDIRECT_URL },
     })
 
-    setLoading(false)
-
     if (error) {
-      if (error.status === 429) {
-        showError('Too many attempts. Please wait a few minutes and try again.')
-      } else {
-        showError('Something went wrong. Check your connection and try again.')
-      }
-      return
+      if (error.code === 'weak_password') return showError('errorMsg', error.message)
+      if (error.code === 'user_already_exists') return alreadyRegistered()
+      return showError('errorMsg', rateLimitOr(error, 'Could not create the account. Please try again.'))
     }
 
-    document.getElementById('sentToEmail').textContent = email
-    document.getElementById('loginForm').style.display = 'none'
-    document.getElementById('successState').classList.add('visible')
+    // With "Confirm email" on, Supabase doesn't reveal existing emails:
+    // it returns a user with no identities and sends nothing.
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      return alreadyRegistered()
+    }
+
+    // Confirm email disabled in the dashboard → session right away.
+    if (data.session) { window.location.replace('index.html'); return }
+
+    lastUnconfirmedEmail = email
+    showMessage('📬', 'Verify your email',
+      `We sent a verification link to<br><strong>${escapeHtml(email)}</strong><br><br>` +
+      "Click it to activate your account. After that you'll sign in with your email and password — no more emails. " +
+      "Check your spam folder if it doesn't arrive.",
+      '← Back to sign in', () => { setMode('signin'); showView('auth') })
   }
 
-  function resetForm() {
-    document.getElementById('loginForm').style.display = 'block'
-    document.getElementById('successState').classList.remove('visible')
-    emailInput.value = ''
-    emailInput.focus()
+  function alreadyRegistered() {
+    setMode('signin')
+    showError('errorMsg', 'An account with this email already exists. Sign in, or use "Forgot password?" if you don\'t have a password yet.')
   }
 
-  function showError(msg) {
-    errorMsg.textContent = msg
-    errorMsg.classList.add('visible')
+  $('resendLink').addEventListener('click', async () => {
+    if (!lastUnconfirmedEmail) return
+    const { error } = await sb.auth.resend({
+      type: 'signup',
+      email: lastUnconfirmedEmail,
+      options: { emailRedirectTo: REDIRECT_URL },
+    })
+    $('resendLink').hidden = true
+    if (error) return showError('errorMsg', rateLimitOr(error, 'Could not resend the email. Please try again.'))
+    showError('errorMsg', 'Verification email sent again. Check your inbox (and spam).')
+  })
+
+  // ── Forgot password ─────────────────────────────────────────
+  forgotForm.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    hideError('forgotError')
+    const email = $('forgotEmail').value.trim()
+    if (!EMAIL_RE.test(email)) return showError('forgotError', 'Please enter a valid email address.')
+
+    setLoading('forgotBtn', true)
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: REDIRECT_URL })
+    setLoading('forgotBtn', false)
+
+    if (error) return showError('forgotError', rateLimitOr(error, 'Could not send the email. Please try again.'))
+
+    // Same message whether or not the account exists (no email enumeration).
+    showMessage('📬', 'Check your email',
+      `If an account exists for<br><strong>${escapeHtml(email)}</strong>,<br>` +
+      "you'll get a link to set a new password. It's valid for 1 hour. Check your spam folder too.",
+      '← Back to sign in', () => showView('auth'))
+  })
+
+  // ── New password (from reset link) ──────────────────────────
+  newPassForm.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    hideError('newPassError')
+    const p1 = $('newPass1').value
+    const p2 = $('newPass2').value
+    if (p1.length < MIN_PASSWORD) return showError('newPassError', `Password must be at least ${MIN_PASSWORD} characters.`)
+    if (p1 !== p2) return showError('newPassError', 'Passwords do not match.')
+
+    setLoading('newPassBtn', true)
+    const { error } = await sb.auth.updateUser({ password: p1 })
+    setLoading('newPassBtn', false)
+
+    if (error) {
+      if (error.code === 'weak_password' || error.code === 'same_password') return showError('newPassError', error.message)
+      return showError('newPassError', 'Could not save the password. The link may have expired — request a new one.')
+    }
+
+    history.replaceState(null, '', window.location.pathname)
+    showMessage('✅', 'Password saved',
+      "You're signed in. Next time, sign in with your email and this password.",
+      'Go to LazyShift →', () => window.location.replace('index.html'))
+  })
+
+  // ── Helpers ─────────────────────────────────────────────────
+  function rateLimitOr(error, fallback) {
+    return error.status === 429 || error.code === 'over_email_send_rate_limit'
+      ? 'Too many attempts. Please wait a few minutes and try again.'
+      : fallback
   }
-  function hideError() {
-    errorMsg.classList.remove('visible')
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
   }
-  function setLoading(on) {
-    sendBtn.disabled = on
-    sendBtn.classList.toggle('loading', on)
+  function showError(id, msg) {
+    const el = $(id)
+    el.textContent = msg
+    el.classList.add('visible')
+  }
+  function hideError(id) {
+    $(id).classList.remove('visible')
+  }
+  function setLoading(btnId, on) {
+    const btn = $(btnId)
+    btn.disabled = on
+    btn.classList.toggle('loading', on)
   }
 
-  emailInput.focus()
+  if (!IS_RECOVERY) emailInput.focus()
 </script>
 </body>
 </html>
