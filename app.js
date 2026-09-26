@@ -720,6 +720,10 @@ function triggerNativeInstall() {
 }
 
 // ===== Share =====
+// Landing page. Single source for every share button — lazyshift.app
+// was used here before and doesn't exist (NXDOMAIN).
+const SHARE_URL = 'https://lazyshift.com';
+
 function openShareModal() {
   const modal = document.getElementById('share-modal');
   if (modal) modal.style.display = 'flex';
@@ -729,14 +733,14 @@ function closeShareModal() {
   if (modal) modal.style.display = 'none';
 }
 function shareWhatsApp() {
-  const msg = encodeURIComponent('Found this shift calculator — automatically calculates hours and overtime 👇\nhttps://lazyshift.app');
+  const msg = encodeURIComponent('Found this shift calculator — automatically calculates hours and overtime 👇\n' + SHARE_URL);
   window.open('https://wa.me/?text=' + msg, '_blank');
 }
 function shareFacebook() {
-  window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://lazyshift.app'), '_blank');
+  window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(SHARE_URL), '_blank');
 }
 function copyLink() {
-  navigator.clipboard.writeText('https://lazyshift.app').then(() => {
+  navigator.clipboard.writeText(SHARE_URL).then(() => {
     const btn = document.getElementById('copy-btn-text');
     if (btn) {
       btn.textContent = '✓ Link copied!';
