@@ -594,10 +594,31 @@ function registerPdfEmail(email) {
   localStorage.setItem(PDF_DATE_KEY, new Date().toISOString());
 }
 
+// Same rule as the pdf_subscribers_email_format CHECK constraint, so the
+// user is told about a bad address instead of the insert failing later.
+const PDF_EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+// Non-blocking: the PDF is generated even if saving fails, but failures
+// are no longer silent. supabase-js returns { error } instead of
+// throwing, so the result must be checked explicitly.
 async function savePdfEmailToSupabase(email) {
+  let error;
   try {
-    await sb.from('pdf_subscribers').upsert({ email, registered_at: new Date().toISOString() }, { onConflict: 'email' });
-  } catch(e) { /* non-critical */ }
+    // Plain insert (anon has INSERT only — no upsert, see the
+    // pdf_subscribers migration). 23505 = email already registered,
+    // which is fine.
+    ({ error } = await sb.from('pdf_subscribers').insert({ email: email.toLowerCase() }));
+  } catch (e) {
+    error = e; // network failure etc.
+  }
+  if (!error || error.code === '23505') return true;
+
+  console.error('pdf_subscribers: failed to save email', error);
+  // Reaches us in GA4 when the visitor accepted analytics cookies.
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', 'pdf_email_save_failed', { error_code: error.code || 'network' });
+  }
+  return false;
 }
 
 function tryExportPdf() {
@@ -625,7 +646,7 @@ function closePdfModal() {
 
 async function confirmPdfEmail() {
   const email = document.getElementById('pdf-email-input').value.trim();
-  if (!email || !email.includes('@')) {
+  if (!PDF_EMAIL_RE.test(email) || email.length > 320) {
     document.getElementById('pdf-modal-error').textContent = 'Please enter a valid email address.';
     document.getElementById('pdf-modal-error').style.display = 'block';
     return;
