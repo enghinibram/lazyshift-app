@@ -489,16 +489,15 @@
         padding:13px; font-size:15px; font-weight:700; margin-bottom:10px;">
         Start free trial — 30 days free
       </a>
-      <a href="https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac24a-c2e4-4b0d-a790-5782b48b28b3"
-         target="_blank" rel="noopener"
-         style="display:block; background:transparent; border:1px solid #4ade80; color:#4ade80;
-                text-decoration:none; border-radius:10px;
-                padding:13px; font-size:15px; font-weight:700; margin-bottom:10px;">
-        Upgrade to Pro →
-      </a>
-      <p style="font-size:12px; color:#888; line-height:1.5; margin:0 0 12px;">Payments are handled by Lemon Squeezy. By upgrading you agree to our
+      <button type="button" disabled aria-disabled="true"
+         style="display:block; width:100%; background:transparent; border:1px solid #4ade80; color:#4ade80;
+                border-radius:10px; padding:13px; font-size:15px; font-weight:700; margin-bottom:10px;
+                opacity:0.55; cursor:not-allowed; font-family:inherit;">
+        Pro: coming soon
+      </button>
+      <p style="font-size:12px; color:#888; line-height:1.5; margin:0 0 12px;">Paid Pro subscriptions are not on sale yet. See our
         <a href="/terms.html" target="_blank" style="color:#aaa;">Terms</a> and
-        <a href="/refund.html" target="_blank" style="color:#aaa;">Refund &amp; Cancellation Policy</a>.</p>
+        <a href="/privacy.html" target="_blank" style="color:#aaa;">Privacy Policy</a>.</p>
       <button onclick="document.getElementById('salary-upgrade-overlay').style.display='none'" style="
         background:none; border:1px solid #444; border-radius:10px;
         padding:11px; width:100%; color:#aaa; font-size:14px; cursor:pointer;">
@@ -527,7 +526,7 @@
         const sub     = document.getElementById('salary-overlay-sub')
         if (status === 'expired') {
           title.textContent = 'Trial ended'
-          sub.textContent   = 'Upgrade to Pro for unlimited salary calculations and full year access.'
+          sub.textContent   = 'Pro, with unlimited salary calculations and full year access, is coming soon.'
         } else {
           title.textContent = 'Free calculation used'
           sub.textContent   = 'Sign in for a 30-day free trial with unlimited salary calculations and more.'
