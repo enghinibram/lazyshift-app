@@ -39,10 +39,11 @@
   </style>
 </head>
 <body>
+<!-- TODO: confirm with a legal adviser whether a geographic address must be published and whether a UK representative under UK GDPR Art. 27 is required. -->
 <div class="privacy-wrap">
   <a class="back-link" href="/">← Back to LazyShift</a>
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: 19 October 2026</p>
+  <p class="updated">Last updated: 20 October 2026</p>
 
   <p>
     This policy explains what personal data LazyShift collects when you use
@@ -53,12 +54,13 @@
 
   <h2>1. Who we are</h2>
   <p>
-    LazyShift is operated by <strong>[TODO: legal name — individual or company name]</strong>
-    [TODO: company number, if a company], [TODO: registered/postal address].
-    We are the data controller for the personal data described in this policy.
+    LazyShift is operated by <strong>Ibram Enghin</strong>, an individual (not a company), who is the data controller
+    for the personal data described in this policy.
   </p>
-  <p>Contact for privacy questions and requests: <a href="mailto:contact@lazyshift.com">contact@lazyshift.com</a> [TODO: confirm contact email].</p>
-  <p>[TODO: if the operator is not established in the UK, name the UK representative under Article 27 UK GDPR, or remove this line if an exemption applies.]</p>
+  <p>
+    Contact: <a href="mailto:dev.lazylabs@gmail.com">dev.lazylabs@gmail.com</a>.
+    Postal address available on request by email to <a href="mailto:dev.lazylabs@gmail.com">dev.lazylabs@gmail.com</a>.
+  </p>
 
   <h2>2. What data we collect and why</h2>
   <div class="table-scroll">
@@ -68,34 +70,39 @@
     </thead>
     <tbody>
       <tr>
-        <td><strong>Account data</strong>: email address and password. Passwords are stored <strong>hashed</strong> by our authentication provider (Supabase Auth) — we never see or store them in readable form. Sign-in records (such as IP address and time) are kept by Supabase for security.</td>
+        <td><strong>Account data</strong>: email address and password. Passwords are stored <strong>hashed</strong> by our authentication provider (Supabase Auth) — we never see or store them in readable form. Supabase also keeps sign-in records (such as IP address and time) for security.</td>
         <td>Creating and securing your account, signing you in, password resets.</td>
-        <td>Performance of a contract (Art. 6(1)(b)); security logs: legitimate interests (Art. 6(1)(f)) in keeping the service secure.</td>
+        <td>Performance of a contract (Art. 6(1)(b)); security records: legitimate interests (Art. 6(1)(f)) in keeping the service secure.</td>
       </tr>
       <tr>
-        <td><strong>Schedule data</strong>: shift pattern and start date, annual-leave and sick-leave days you mark, custom working days and hours, shift start time and your device's time zone.</td>
-        <td>Saving your calendar and syncing it across your devices; computing reminder times.</td>
+        <td><strong>Account profile</strong>: your account ID, email address, the date your free trial ends and, once Pro is available, whether you have Pro, when it expires and your Lemon Squeezy subscription ID.</td>
+        <td>Running your free trial and deciding which features your account can use.</td>
         <td>Performance of a contract (Art. 6(1)(b)).</td>
       </tr>
       <tr>
-        <td><strong>Subscription data</strong>: trial dates, Pro status and expiry, your Lemon Squeezy subscription ID, and the subscription notifications Lemon Squeezy sends us (these include your name and email, and may include your country and the brand and last four digits of your card). We never receive your full card number.</td>
-        <td>Giving you Pro access after you pay, ending it when the subscription ends or is refunded, keeping billing records.</td>
-        <td>Performance of a contract (Art. 6(1)(b)); legal obligation for accounting records (Art. 6(1)(c)).</td>
+        <td><strong>Schedule data</strong>: shift pattern and start date, annual-leave and sick-leave days you mark, custom working days and hours, shift start time and your device's time zone.</td>
+        <td>Saving your calendar and syncing it across your devices; working out when to send reminders.</td>
+        <td>Performance of a contract (Art. 6(1)(b)).</td>
       </tr>
       <tr>
-        <td><strong>Push notification subscription</strong>: the push endpoint and encryption keys your browser creates when you enable shift reminders, and a log of when a reminder was sent.</td>
-        <td>Sending the shift reminders you asked for, and not sending duplicates.</td>
-        <td>Consent (Art. 6(1)(a)) — given via your browser's notification prompt; you can withdraw it at any time in your browser settings.</td>
+        <td><strong>Push notification subscription</strong>: the push address and encryption keys your browser creates when you turn on shift reminders, and a record of when each reminder was sent.</td>
+        <td>Sending the shift reminders you asked for, without duplicates.</td>
+        <td>Consent (Art. 6(1)(a)), given through your browser's notification prompt. You can withdraw it at any time in your browser settings.</td>
       </tr>
       <tr>
-        <td><strong>PDF export email</strong>: the email address you enter in the "Free PDF export" form, and when you entered it.</td>
+        <td><strong>PDF export email</strong>: if you use the app without an account, the email address you enter in the "Free PDF export" form and the date you entered it.</td>
         <td>Registering you for free PDF exports. We do not send marketing emails to this address.</td>
         <td>Performance of a contract (Art. 6(1)(b)).</td>
       </tr>
       <tr>
-        <td><strong>Analytics data</strong> (only if you accept cookies): pages visited, session duration, device and browser type, approximate location (country/city), collected by Google Analytics 4.</td>
+        <td><strong>Subscription data</strong> (once Pro is on sale): Lemon Squeezy tells us when a subscription starts, renews, is cancelled or ends, including the email address used at checkout. We use the email to find your account and store only the profile fields listed above. We never receive your card details.</td>
+        <td>Giving you Pro access after you pay and ending it when the subscription ends; keeping billing records.</td>
+        <td>Performance of a contract (Art. 6(1)(b)); legal obligation for accounting records (Art. 6(1)(c)).</td>
+      </tr>
+      <tr>
+        <td><strong>Analytics data</strong> (only if you accept cookies): pages visited, session duration, device and browser type, approximate location, collected by Google Analytics 4.</td>
         <td>Understanding how LazyShift is used so we can improve it.</td>
-        <td>Consent (Art. 6(1)(a)) — given via the cookie banner, as required by the Privacy and Electronic Communications Regulations (PECR).</td>
+        <td>Consent (Art. 6(1)(a)), given through the cookie banner, as required by the Privacy and Electronic Communications Regulations (PECR).</td>
       </tr>
       <tr>
         <td><strong>Emails you send us</strong>.</td>
@@ -107,7 +114,7 @@
   </div>
   <p>
     The salary calculator runs entirely in your browser: the salary figures you enter are not sent to us.
-    We do not use your data for automated decision-making or profiling with legal or similarly significant effects.
+    We do not make automated decisions about you that have legal or similarly significant effects.
   </p>
 
   <h2 id="cookies">3. Cookies and local storage</h2>
@@ -120,41 +127,42 @@
   </p>
   <p>
     We also use your browser's local storage for things that are strictly necessary for the service or that you asked for,
-    which do not require consent: your sign-in session, your cookie choice, your light/dark theme, the email you entered for
+    which do not need consent: your sign-in session, your cookie choice, your light/dark theme, the email you entered for
     PDF exports, and whether you have used your free salary calculation.
   </p>
   <p>We do not use advertising cookies or any advertising or cross-site tracking technology.</p>
 
   <h2>4. Who we share data with</h2>
-  <p>We do not sell your personal data. We share it only with the service providers (processors) we need to run LazyShift:</p>
+  <p>We do not sell your personal data. We share it only with the service providers we need to run LazyShift:</p>
   <ul>
-    <li><strong>Supabase</strong> — authentication and database. Data hosted in [TODO: Supabase project region]. (<a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase privacy policy</a>)</li>
-    <li><strong>Vercel</strong> — runs the server function that receives payment notifications from Lemon Squeezy. (<a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel privacy policy</a>)</li>
-    <li><strong>GitHub Pages</strong> — hosts the app's web pages; it processes your IP address to deliver them. [TODO: confirm hosting provider(s) for app.lazyshift.com and lazyshift.com.] (<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub privacy statement</a>)</li>
+    <li><strong>Supabase</strong> — database and authentication. Your data is stored in Supabase's West EU (Ireland) region. (<a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase privacy policy</a>)</li>
+    <li><strong>Cloudflare</strong> — DNS and proxy for our domains; it processes your IP address and request data to deliver and protect the site. (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare privacy policy</a>)</li>
+    <li><strong>GitHub Pages</strong> — static hosting of the website and app. (<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub privacy statement</a>)</li>
+    <li><strong>Vercel</strong> — serverless functions, such as the one that will receive subscription notifications from Lemon Squeezy. (<a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel privacy policy</a>)</li>
+    <li><strong>Lemon Squeezy</strong> — payments, once Pro is launched. Lemon Squeezy will act as our reseller and Merchant of Record: it collects your payment and billing details directly and processes them under its own <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener">privacy policy</a>.</li>
+    <li><strong>Google Analytics</strong> (Google Ireland Ltd / Google LLC) — website analytics, only after you consent. (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google privacy policy</a>)</li>
     <li><strong>jsDelivr</strong> — content delivery network that serves the Supabase JavaScript library; it processes your IP address to deliver the file.</li>
-    <li><strong>Lemon Squeezy</strong> — our reseller and Merchant of Record. When you buy LazyShift Pro, Lemon Squeezy collects your payment and billing details directly and processes them as an independent controller under its own <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener">privacy policy</a>. We pass it your email address and account ID so it can link the purchase to your account.</li>
-    <li><strong>Google Analytics</strong> (Google Ireland Ltd / Google LLC) — website analytics, only with your consent. (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google privacy policy</a>)</li>
-    <li><strong>Your browser's push service</strong> (for example Google, Apple or Mozilla) — delivers shift reminders if you enable them. The reminder content is encrypted end-to-end.</li>
+    <li><strong>Your browser's push service</strong> (for example Google, Apple or Mozilla) — delivers shift reminders if you turn them on.</li>
   </ul>
-  <p>We may also disclose data where required by law or to protect our legal rights.</p>
+  <p>We may also disclose data where the law requires it or to protect our legal rights.</p>
 
   <h2>5. International transfers</h2>
   <p>
-    Some of these providers (including Vercel, GitHub, Google, Lemon Squeezy and jsDelivr's network) process data in the
-    United States or other countries outside the UK. Where they do, the transfer is protected by an adequacy regulation
-    (including the UK Extension to the EU–US Data Privacy Framework, where the provider is certified) or by the
-    International Data Transfer Addendum to the EU Standard Contractual Clauses approved by the ICO.
-    You can ask us for more information about these safeguards.
+    Our database is in the European Economic Area (Ireland), which the UK recognises as providing adequate protection.
+    Some other providers (including Cloudflare, GitHub, Vercel, Google, Lemon Squeezy and jsDelivr's network) may process
+    data in the United States or other countries outside the UK. Where they do, the transfer is protected by UK adequacy
+    regulations (including the UK Extension to the EU–US Data Privacy Framework, where the provider is certified) or by the
+    International Data Transfer Addendum to the EU Standard Contractual Clauses. You can ask us for more information.
   </p>
 
   <h2>6. How long we keep data</h2>
   <ul>
-    <li><strong>Account and schedule data</strong> — while your account exists. When you ask us to delete your account we delete it within 30 days. [TODO: confirm period]</li>
-    <li><strong>Push subscriptions</strong> — until you turn off notifications for LazyShift in your browser, the browser revokes the subscription, or your account is deleted.</li>
-    <li><strong>Subscription and billing records</strong> — 6 years after the end of the financial year they relate to, for UK accounting and tax purposes. [TODO: confirm period]</li>
-    <li><strong>PDF export email</strong> — [TODO: retention period, e.g. 12 months after you entered it, matching the 1-year free PDF offer].</li>
-    <li><strong>Google Analytics data</strong> — 14 months. [TODO: confirm the retention setting in the new GA4 property]</li>
-    <li><strong>Emails you send us</strong> — up to 2 years after the matter is closed. [TODO: confirm period]</li>
+    <li><strong>Account, profile and schedule data</strong> — until your account is deleted, then removed within 30 days.</li>
+    <li><strong>Push subscriptions and reminder records</strong> — until you turn off notifications for LazyShift in your browser, the browser withdraws the subscription, or your account is deleted.</li>
+    <li><strong>Billing records</strong> — 6 years.</li>
+    <li><strong>PDF export email</strong> — until you ask us to delete it.</li>
+    <li><strong>Support emails</strong> — 2 years.</li>
+    <li><strong>Google Analytics data</strong> — for the retention period set in Google Analytics, at most 14 months.</li>
   </ul>
 
   <h2>7. Your rights</h2>
@@ -169,9 +177,8 @@
   </ul>
   <p>
     <strong>To delete your account and data</strong>, or to exercise any other right, email
-    <a href="mailto:contact@lazyshift.com?subject=Data%20request">contact@lazyshift.com</a> from the email address
-    linked to your account. We reply within one month. Deleting your account does not cancel a Lemon Squeezy subscription —
-    please cancel it first (see our <a href="/refund.html">Refund &amp; Cancellation Policy</a>).
+    <a href="mailto:dev.lazylabs@gmail.com?subject=Data%20request">dev.lazylabs@gmail.com</a> from the email address
+    linked to your account. We reply within one month.
   </p>
 
   <h2>8. Complaints</h2>
@@ -185,8 +192,7 @@
 
   <h2>10. Security</h2>
   <p>
-    Data is transmitted over HTTPS. Database access is restricted with row-level security so that each account can only read
-    its own data, and passwords are hashed by Supabase Auth.
+    Data is sent over HTTPS, access to our database is limited to the services that need it, and passwords are hashed by Supabase Auth.
   </p>
 
   <h2>11. Changes</h2>
