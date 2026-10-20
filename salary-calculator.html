@@ -506,7 +506,7 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/vendor/supabase-js-2.117.2/supabase.js"></script>
   <script src="auth.js"></script>
   <script>
     const SALARY_USED_KEY = 'lazyshift-salary-used'
@@ -539,6 +539,8 @@
       localStorage.setItem(SALARY_USED_KEY, '1')
       calculate()
     }
+
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')
   </script>
   <footer class="site-footer">
     <a href="/terms.html">Terms of Service</a>

@@ -310,6 +310,40 @@ function deserializeSet(str) {
   catch { return new Set(); }
 }
 
+// ===== Offline =====
+// Shown wherever an action needs the network and there is none.
+const OFFLINE_MSG = "You're offline. Connect to the internet and try again.";
+function isOffline() { return !navigator.onLine; }
+
+// Note above the calendar while a signed-in user is offline: the
+// schedule shown is this device's last synced copy, edits aren't synced.
+function updateOfflineNotice() {
+  const el = document.getElementById('nav-notice');
+  if (!el) return;
+  if (currentUser && isOffline()) {
+    el.className = 'info';
+    el.textContent = "You're offline. Changes made now are not saved to your account.";
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
+}
+window.addEventListener('online', updateOfflineNotice);
+window.addEventListener('offline', updateOfflineNotice);
+
+// Last settings loaded from / saved to Supabase, so a signed-in user's
+// schedule still draws offline. One user at a time.
+const SETTINGS_CACHE_KEY = 'lazyshift-settings';
+function cacheSettings(row) {
+  try { localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(row)); } catch {}
+}
+function readCachedSettings(userId) {
+  try {
+    const row = JSON.parse(localStorage.getItem(SETTINGS_CACHE_KEY));
+    return row && row.user_id === userId ? row : null;
+  } catch { return null; }
+}
+
 // ===== Supabase: save =====
 async function saveSettings() {
   if (!currentUser) return;
@@ -319,7 +353,7 @@ async function saveSettings() {
     : null;
   const shiftStartInput = document.getElementById('shift-start-time');
   const shiftStartTime = shiftStartInput && shiftStartInput.value ? shiftStartInput.value : null;
-  await sb.from('user_settings').upsert({
+  const row = {
     user_id:          currentUser.id,
     start_date:       startStr,
     tura_type:        shiftType,
@@ -328,17 +362,36 @@ async function saveSettings() {
     custom_days:      serializeSet(customDays),
     custom_ore:       getCustomOre(),
     shift_start_time: shiftStartTime,
-  }, { onConflict: 'user_id' });
+  };
+  if (isOffline()) { updateOfflineNotice(); return; }
+  try {
+    const { error } = await sb.from('user_settings').upsert(row, { onConflict: 'user_id' });
+    if (!error) cacheSettings({ ...readCachedSettings(currentUser.id), ...row });
+  } catch (e) {
+    console.error('saveSettings failed', e);
+  }
 }
 
 // ===== Supabase: load =====
 async function loadSettings() {
   if (!currentUser) return;
-  const { data } = await sb
-    .from('user_settings')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .single();
+  let data = null, status = 0;
+  // Offline, don't wait for supabase-js to retry the request.
+  if (!isOffline()) {
+    try {
+      ({ data, status } = await sb
+        .from('user_settings')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .single());
+    } catch {
+      status = 0;
+    }
+  }
+  if (data) cacheSettings(data);
+  // status 0 = no network: fall back to this device's last copy.
+  else if (status === 0) data = readCachedSettings(currentUser.id);
+  updateOfflineNotice();
   if (data) {
     if (data.tura_type) {
       document.getElementById('shift-type').value = data.tura_type;
@@ -650,6 +703,11 @@ async function confirmPdfEmail() {
     document.getElementById('pdf-modal-error').style.display = 'block';
     return;
   }
+  if (isOffline()) {
+    document.getElementById('pdf-modal-error').textContent = OFFLINE_MSG;
+    document.getElementById('pdf-modal-error').style.display = 'block';
+    return;
+  }
   registerPdfEmail(email);
   await savePdfEmailToSupabase(email);
   closePdfModal();
@@ -801,9 +859,20 @@ async function doResetPassword() {
     return;
   }
 
-  const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + window.location.pathname,
-  });
+  if (isOffline()) {
+    errEl.textContent = OFFLINE_MSG;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  let error;
+  try {
+    ({ error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname,
+    }));
+  } catch (e) {
+    error = e;
+  }
 
   if (error) {
     errEl.textContent = 'Error sending email. Please try again.';
@@ -862,7 +931,13 @@ async function doRegister() {
 
 async function doLogout() {
   closeDropdown();
-  await sb.auth.signOut();
+  // Offline, signOut can't reach Supabase and leaves the session as it is.
+  if (isOffline()) { alert(OFFLINE_MSG); return; }
+  try {
+    await sb.auth.signOut();
+  } catch (e) {
+    console.error('signOut failed', e);
+  }
 }
 
 // ===== Dropdown =====
@@ -921,10 +996,26 @@ function updateUserBar(user) {
 
 // ===== Auth State =====
 sb.auth.onAuthStateChange(async (event, session) => {
-  const user = session?.user ?? null;
+  // Offline with an expired token supabase-js reports no session (see
+  // Auth.offlineUser in auth.js); keep showing the stored user.
+  const user = session?.user ?? (event !== 'SIGNED_OUT' && window.Auth ? Auth.offlineUser() : null);
+  if (event === 'SIGNED_OUT') {
+    try { localStorage.removeItem(SETTINGS_CACHE_KEY); } catch {}
+  }
   updateUserBar(user);
+  updateOfflineNotice();
   if (user) await loadSettings();
 });
+
+// Offline, supabase-js retries the token refresh for a long time before
+// its first event: show the stored user and their last schedule now.
+(function showOfflineUser() {
+  const user = window.Auth && Auth.offlineUser();
+  if (!user) return;
+  updateUserBar(user);
+  updateOfflineNotice();
+  loadSettings();
+})();
 
 // ===== Push notifications (shift reminder, trial + Pro) =====
 // Eligibility comes from auth.js (Auth.getAccessLevel): logged in AND
@@ -988,6 +1079,11 @@ async function activatePush() {
 
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     showPushStatus('Your browser does not support push notifications.', 'error');
+    return;
+  }
+
+  if (isOffline()) {
+    showPushStatus(OFFLINE_MSG, 'error');
     return;
   }
 
@@ -1080,7 +1176,18 @@ async function doSetNewPassword() {
     return;
   }
 
-  const { error } = await sb.auth.updateUser({ password: p1 });
+  if (isOffline()) {
+    errEl.textContent = OFFLINE_MSG;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  let error;
+  try {
+    ({ error } = await sb.auth.updateUser({ password: p1 }));
+  } catch (e) {
+    error = e;
+  }
   if (error) {
     errEl.textContent = 'Error saving password. Please try again.';
     errEl.style.display = 'block';
