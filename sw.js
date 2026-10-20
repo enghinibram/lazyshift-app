@@ -1,9 +1,10 @@
-const CACHE = 'lazyshift-v21';
+const CACHE = 'lazyshift-v23';
 const ASSETS = [
   '/',
   '/index.html',
   '/style.css',
   '/app.js',
+  '/consent.js',
   '/manifest.json',
 ];
 

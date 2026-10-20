@@ -614,10 +614,9 @@ async function savePdfEmailToSupabase(email) {
   if (!error || error.code === '23505') return true;
 
   console.error('pdf_subscribers: failed to save email', error);
-  // Reaches us in GA4 when the visitor accepted analytics cookies.
-  if (typeof window.gtag === 'function') {
-    window.gtag('event', 'pdf_email_save_failed', { error_code: error.code || 'network' });
-  }
+  // Reaches us in GA4 only when the visitor accepted analytics cookies
+  // (consent.js drops the event otherwise).
+  window.LazyShiftConsent?.trackEvent('pdf_email_save_failed', { error_code: error.code || 'network' });
   return false;
 }
 

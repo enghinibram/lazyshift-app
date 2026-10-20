@@ -1,19 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-79WSB1T1EJ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-79WSB1T1EJ');
-</script>
   <meta charset="UTF-8" />
+  <script src="/consent.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>LazyShift — Free Shift Work Calculator 2026</title>
+  <link rel="icon" type="image/png" href="/icon-192.png" />
   <meta name="description" content="Free shift work calculator. Track your hours, monthly norm, annual leave, sick leave and overtime. Perfect for nurses, port workers, security staff and anyone working shifts." />
   <meta name="keywords" content="shift calculator, shift work, rotating shifts, 12 hour shifts, 24 hour shifts, shift schedule, overtime calculator, shift planner" />
   <link rel="canonical" href="https://app.lazyshift.com/" />
@@ -104,77 +97,6 @@
 </head>
 <body>
 
-  <!-- ===== COOKIE BANNER ===== -->
-  <div id="cookie-banner">
-    <div class="cookie-text">
-      🍪 We use Google Analytics to understand how the app is used. No personal data is stored without your consent.
-      <a href="/privacy.html" target="_blank">Privacy policy</a>
-    </div>
-    <div class="cookie-actions">
-      <button class="cookie-btn cookie-accept" onclick="acceptCookies()">Accept</button>
-      <button class="cookie-btn cookie-reject" onclick="rejectCookies()">Decline</button>
-    </div>
-  </div>
-
-  <style>
-  #cookie-banner {
-    display: none;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: #1a1a2e;
-    color: #f0f0f0;
-    border-top: 2px solid #1D9E75;
-    padding: 14px 20px;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-    justify-content: space-between;
-    z-index: 9999;
-    font-size: 14px;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-  }
-  .cookie-text a { color: #1D9E75; text-decoration: underline; }
-  .cookie-actions { display: flex; gap: 8px; flex-shrink: 0; }
-  .cookie-btn { padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; }
-  .cookie-accept { background: #1D9E75; color: white; }
-  .cookie-reject { background: transparent; color: #f0f0f0; border: 1px solid #555; }
-  @media (max-width: 480px) {
-    #cookie-banner { flex-direction: column; align-items: flex-start; }
-    .cookie-actions { width: 100%; }
-    .cookie-btn { flex: 1; }
-  }
-  </style>
-
-  <script>
-  function acceptCookies() {
-    localStorage.setItem("cookie_consent", "accepted");
-    document.getElementById("cookie-banner").style.display = "none";
-    loadGA();
-  }
-  function rejectCookies() {
-    localStorage.setItem("cookie_consent", "rejected");
-    document.getElementById("cookie-banner").style.display = "none";
-  }
-  function loadGA() {
-    var s = document.createElement("script");
-    s.async = true;
-    s.src = "https://www.googletagmanager.com/gtag/js?id=G-G2M9C9JKJE";
-    document.head.appendChild(s);
-    s.onload = function() {
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      window.gtag = gtag;
-      gtag("js", new Date());
-      gtag("config", "G-G2M9C9JKJE");
-    };
-  }
-  (function() {
-    var c = localStorage.getItem("cookie_consent");
-    if (c === "accepted") { loadGA(); }
-    else if (!c) { document.getElementById("cookie-banner").style.display = "flex"; }
-  })();
-  </script>
-
   <!-- ===== AUTH OVERLAY (redirects to login.html) ===== -->
   <div id="auth-overlay" class="auth-overlay" style="display:none">
     <div class="auth-box" id="auth-box-inner">
@@ -210,6 +132,9 @@
          class="auth-btn" style="text-decoration:none; text-align:center; display:block; margin-top:8px;">
         Upgrade to Pro →
       </a>
+      <p class="legal-note">Payments are handled by Lemon Squeezy. By upgrading you agree to our
+        <a href="/terms.html" target="_blank">Terms</a> and
+        <a href="/refund.html" target="_blank">Refund &amp; Cancellation Policy</a>.</p>
       <button class="auth-btn ghost" onclick="closeUpgradeOverlay()">Maybe later</button>
     </div>
   </div>
@@ -439,7 +364,7 @@
       <h2>Frequently asked questions</h2>
       <dl class="faq-list">
         <dt>Is it free?</dt>
-        <dd>Yes, the core calculator is free to use, with no ads. A premium plan (9.99 RON/month) is available for unlimited PDF exports, the full year view, and unlimited salary calculations.</dd>
+        <dd>Yes, the core calculator is free to use, with no ads. A Pro plan (£3/month) is available for unlimited PDF exports, the full year view, and unlimited salary calculations.</dd>
 
         <dt>Does it work on mobile?</dt>
         <dd>Yes — it can be installed as an app on Android and iOS directly from your browser, no App Store needed.</dd>
@@ -466,6 +391,13 @@
   </div>
 
   </div>
+
+  <footer class="site-footer">
+    <a href="/terms.html">Terms of Service</a>
+    <a href="/refund.html">Refunds &amp; Cancellation</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <button type="button" onclick="openCookieSettings()">Cookie settings</button>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth.js"></script>

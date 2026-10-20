@@ -2,8 +2,10 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
+  <script src="/consent.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Net Salary Calculator 2026 — Shifts & Bonuses | LazyShift</title>
+  <link rel="icon" type="image/png" href="/icon-192.png" />
   <meta name="description" content="Calculate your net take-home pay from gross salary. Supports any country — enter your own tax rates or pick from presets. Includes night shift bonus and overtime." />
   <link rel="canonical" href="https://app.lazyshift.com/salary-calculator.html" />
   <link rel="stylesheet" href="article.css" />
@@ -494,6 +496,9 @@
                 padding:13px; font-size:15px; font-weight:700; margin-bottom:10px;">
         Upgrade to Pro →
       </a>
+      <p style="font-size:12px; color:#888; line-height:1.5; margin:0 0 12px;">Payments are handled by Lemon Squeezy. By upgrading you agree to our
+        <a href="/terms.html" target="_blank" style="color:#aaa;">Terms</a> and
+        <a href="/refund.html" target="_blank" style="color:#aaa;">Refund &amp; Cancellation Policy</a>.</p>
       <button onclick="document.getElementById('salary-upgrade-overlay').style.display='none'" style="
         background:none; border:1px solid #444; border-radius:10px;
         padding:11px; width:100%; color:#aaa; font-size:14px; cursor:pointer;">
@@ -536,5 +541,11 @@
       calculate()
     }
   </script>
+  <footer class="site-footer">
+    <a href="/terms.html">Terms of Service</a>
+    <a href="/refund.html">Refunds &amp; Cancellation</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <button type="button" onclick="openCookieSettings()">Cookie settings</button>
+  </footer>
 </body>
 </html>
