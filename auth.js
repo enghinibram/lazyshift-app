@@ -14,12 +14,18 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
   const Auth = {
     user:    null,   // Supabase auth user
     profile: null,   // row from public.users
+    profileFromCache: false, // true when offline and profile came from localStorage
 
     // ── Public API ──────────────────────────────────────────
 
     getUserStatus() {
       if (!this.user) return 'guest'
-      const { is_pro, trial_ends_at } = this.profile || {}
+      const { is_pro, trial_ends_at, premium_expires } = this.profile || {}
+      // Offline copy: Pro only until premium_expires, checked against
+      // the local clock (online, public.users is the source of truth).
+      if (is_pro && this.profileFromCache && premium_expires && new Date(premium_expires) <= new Date()) {
+        return trial_ends_at && new Date(trial_ends_at) > new Date() ? 'trial' : 'expired'
+      }
       if (is_pro) return 'pro'
       if (trial_ends_at && new Date(trial_ends_at) > new Date()) return 'trial'
       return 'expired'
@@ -47,14 +53,49 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
 
     // ── Internal ────────────────────────────────────────────
 
-    async _getOrCreateProfile(user) {
-      const { data, error } = await authSb
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+    // Offline: the user from the session supabase-js keeps in
+    // localStorage. With an expired access token it can't refresh offline
+    // and reports no session, but keeps it and refreshes once back online.
+    offlineUser() {
+      if (navigator.onLine) return null
+      try { return JSON.parse(localStorage.getItem(SB_STORAGE_KEY))?.user || null } catch { return null }
+    },
 
-      if (data) return data
+    async _getOrCreateProfile(user) {
+      this.profileFromCache = false
+      // Offline, don't wait for supabase-js to retry: use the last
+      // profile seen on this device.
+      if (!navigator.onLine) {
+        const cached = readCachedProfile(user.id)
+        this.profileFromCache = !!cached
+        return cached
+      }
+
+      let data, error, status
+      try {
+        ({ data, error, status } = await authSb
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single())
+      } catch (e) {
+        error = e
+        status = 0
+      }
+
+      if (data) {
+        saveCachedProfile(user.id, data)
+        return data
+      }
+
+      // Create a trial only when Supabase says there is no row (PGRST116).
+      // Any other failure (no network = status 0, expired token, ...): use
+      // the last profile seen on this device.
+      if (!error || error.code !== 'PGRST116') {
+        const cached = readCachedProfile(user.id)
+        this.profileFromCache = !!cached
+        return cached
+      }
 
       // First login — create record with 30-day trial
       const trialEnds = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
@@ -64,6 +105,7 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
         .select()
         .single()
 
+      if (created) saveCachedProfile(user.id, created)
       return created || null
     },
 
@@ -84,17 +126,60 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
     },
 
     init() {
+      // Offline, supabase-js retries the token refresh for a long time
+      // before its first event: show the stored user right away.
+      const stored = this.offlineUser()
+      if (stored) this._onSignIn(stored)
+
       authSb.auth.onAuthStateChange(async (event, session) => {
-        if (session?.user) {
-          await this._onSignIn(session.user)
+        const user = session?.user || (event !== 'SIGNED_OUT' ? this.offlineUser() : null)
+        if (user) {
+          await this._onSignIn(user)
         } else {
+          if (event === 'SIGNED_OUT') clearCachedProfile()
           this._onSignOut()
         }
+      })
+
+      // Back online after using the cached profile: read it again.
+      window.addEventListener('online', async () => {
+        if (!this.user || !this.profileFromCache) return
+        const { data } = await authSb.auth.getSession()
+        if (data.session?.user) await this._onSignIn(data.session.user)
       })
     }
   }
 
   window.Auth = Auth
+
+  // ── Last known profile (offline fallback) ────────────────
+  // Only the fields access depends on, for one user at a time.
+
+  const PROFILE_KEY = 'lazyshift-profile'
+  // Where supabase-js stores the session (its default storage key).
+  const SB_STORAGE_KEY = 'sb-' + new URL(AUTH_SUPABASE_URL).hostname.split('.')[0] + '-auth-token'
+
+  function saveCachedProfile(userId, p) {
+    try {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify({
+        id:              userId,
+        is_pro:          !!p.is_pro,
+        trial_ends_at:   p.trial_ends_at || null,
+        premium_expires: p.premium_expires || null,
+      }))
+    } catch {}
+  }
+
+  function readCachedProfile(userId) {
+    try {
+      const p = JSON.parse(localStorage.getItem(PROFILE_KEY))
+      return p && p.id === userId ? p : null
+    } catch { return null }
+  }
+
+  function clearCachedProfile() {
+    try { localStorage.removeItem(PROFILE_KEY) } catch {}
+  }
 
   // ── Upgrade Overlay ──────────────────────────────────────
 

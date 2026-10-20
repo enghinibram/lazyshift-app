@@ -357,7 +357,7 @@
   const SUPABASE_URL      = 'https://tmkrbnkztmohfoohbgfy.supabase.co'
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRta3Jibmt6dG1vaGZvb2hiZ2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NzEwMDYsImV4cCI6MjA5NzA0NzAwNn0.3cs4A3nLk8jIEfo4byWpPiJrf59qnli1QiKeM7GiB8I'
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/vendor/supabase-js-2.117.2/supabase.js"></script>
 <script>
   // Read before createClient: supabase-js parses and clears the URL hash
   // during init. A password-reset link lands here with type=recovery and
@@ -373,6 +373,8 @@
   const REDIRECT_URL = window.location.origin + '/login.html'
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   const MIN_PASSWORD = 6
+  // Signing in, signing up and password emails all need Supabase.
+  const OFFLINE_MSG = "You're offline. Connect to the internet and try again."
 
   const $ = id => document.getElementById(id)
   const authForm    = $('authForm')
@@ -461,6 +463,7 @@
     if (mode === 'signup' && password.length < MIN_PASSWORD) {
       return showError('errorMsg', `Password must be at least ${MIN_PASSWORD} characters.`)
     }
+    if (!navigator.onLine) return showError('errorMsg', OFFLINE_MSG)
 
     setLoading('submitBtn', true)
     if (mode === 'signin') await signIn(email, password)
@@ -520,6 +523,7 @@
 
   $('resendLink').addEventListener('click', async () => {
     if (!lastUnconfirmedEmail) return
+    if (!navigator.onLine) return showError('errorMsg', OFFLINE_MSG)
     const { error } = await sb.auth.resend({
       type: 'signup',
       email: lastUnconfirmedEmail,
@@ -536,6 +540,7 @@
     hideError('forgotError')
     const email = $('forgotEmail').value.trim()
     if (!EMAIL_RE.test(email)) return showError('forgotError', 'Please enter a valid email address.')
+    if (!navigator.onLine) return showError('forgotError', OFFLINE_MSG)
 
     setLoading('forgotBtn', true)
     const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: REDIRECT_URL })
@@ -558,6 +563,7 @@
     const p2 = $('newPass2').value
     if (p1.length < MIN_PASSWORD) return showError('newPassError', `Password must be at least ${MIN_PASSWORD} characters.`)
     if (p1 !== p2) return showError('newPassError', 'Passwords do not match.')
+    if (!navigator.onLine) return showError('newPassError', OFFLINE_MSG)
 
     setLoading('newPassBtn', true)
     const { error } = await sb.auth.updateUser({ password: p1 })
@@ -598,6 +604,8 @@
   }
 
   if (!IS_RECOVERY) emailInput.focus()
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js')
 </script>
   <footer class="site-footer">
     <a href="/terms.html">Terms of Service</a>
