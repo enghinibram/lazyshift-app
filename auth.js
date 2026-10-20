@@ -107,8 +107,8 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
     } else {
       title    = 'Your trial has ended'
       subtitle = reason === 'month'
-        ? 'Upgrade to Pro to view any month of the year and keep your full schedule.'
-        : 'Upgrade to Pro for unlimited PDF exports and full year access.'
+        ? 'Pro, with any month of the year and your full schedule, is coming soon.'
+        : 'Pro, with unlimited PDF exports and full year access, is coming soon.'
     }
 
     document.getElementById('upgrade-title').textContent    = title

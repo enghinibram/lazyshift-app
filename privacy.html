@@ -1,93 +1,221 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="UTF-8" />
+  <script src="/consent.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Privacy Policy | LazyShift</title>
-  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/png" href="/icon-192.png" />
+  <meta name="description" content="How LazyShift collects, uses and protects your personal data under the GDPR and UK GDPR." />
+  <link rel="canonical" href="https://app.lazyshift.com/privacy.html" />
+  <meta property="og:title" content="Privacy Policy | LazyShift" />
+  <meta property="og:description" content="How LazyShift collects, uses and protects your personal data under the GDPR and UK GDPR." />
+  <meta property="og:url" content="https://app.lazyshift.com/privacy.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_GB" />
+  <meta property="og:image" content="https://app.lazyshift.com/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#1D9E75" />
   <link rel="stylesheet" href="style.css" />
   <style>
     .privacy-wrap {
       max-width: 760px;
       margin: 0 auto;
-      padding: 40px 20px 80px;
+      padding: 40px 20px 40px;
       line-height: 1.8;
       font-size: 15px;
     }
     .privacy-wrap h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #1D9E75; }
     .privacy-wrap h2 { font-size: 1.1rem; margin-top: 2rem; margin-bottom: 0.5rem; }
-    .privacy-wrap p, .privacy-wrap li { color: var(--text, #333); }
+    .privacy-wrap p, .privacy-wrap li, .privacy-wrap td, .privacy-wrap th { color: var(--text, #333); }
     .privacy-wrap a { color: #1D9E75; }
+    .privacy-wrap ul { padding-left: 1.4rem; }
+    .privacy-wrap table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.5; margin: 0.75rem 0; }
+    .privacy-wrap th, .privacy-wrap td { text-align: left; vertical-align: top; padding: 8px; border-bottom: 1px solid rgba(128,128,128,0.25); }
+    .table-scroll { overflow-x: auto; }
     .back-link { display: inline-block; margin-bottom: 2rem; color: #1D9E75; text-decoration: none; font-weight: 600; }
     .back-link:hover { text-decoration: underline; }
     .updated { font-size: 13px; color: #888; margin-bottom: 2rem; }
   </style>
 </head>
 <body>
+<!-- TODO: confirm with a legal adviser whether a geographic address must be published and whether a UK representative under UK GDPR Art. 27 is required. -->
+<!-- TODO: confirm with a legal adviser how EU and UK rules apply to this operator. -->
 <div class="privacy-wrap">
-  <a class="back-link" href="/">← Back to calculator</a>
+  <a class="back-link" href="/">← Back to LazyShift</a>
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: September 2026</p>
+  <p class="updated">Last updated: 20 October 2026</p>
+
+  <p>
+    This policy explains what personal data LazyShift collects when you use
+    <strong>app.lazyshift.com</strong> and <strong>lazyshift.com</strong>, why we collect it,
+    who we share it with and what your rights are.
+  </p>
+  <p>
+    We process personal data under the EU General Data Protection Regulation (Regulation (EU) 2016/679, "GDPR").
+    For users in the United Kingdom, we also process it under the UK General Data Protection Regulation ("UK GDPR")
+    and the Data Protection Act 2018. In this policy, "GDPR" refers to both where they apply.
+  </p>
 
   <h2>1. Who we are</h2>
   <p>
-    This site, <strong>lazyshift.com</strong>, is operated by <strong>Ibram Enghin</strong>, an individual based in Romania. Contact: <a href="mailto:contact@lazyshift.com">contact@lazyshift.com</a>
-  </p>
-
-  <h2>2. What data we collect</h2>
-  <p>The site collects data in two ways:</p>
-  <ul>
-    <li><strong>Anonymous technical data</strong> — via Google Analytics 4 (GA4), if you accept cookies: pages visited, session duration, device type, country. This data is anonymised and does not identify you personally. GA4 runs on both of our sites, each with its own property:
-      <ul>
-        <li><strong>app.lazyshift.com</strong> (the calculator app) — measurement ID <code>G-G2M9C9JKJE</code></li>
-        <li><strong>lazyshift.com</strong> (the landing page) — measurement ID <code>G-79WSB1T1EJ</code></li>
-      </ul>
-    </li>
-    <li><strong>Account data (optional)</strong> — if you create an account via Supabase: your email address and saved shift settings. Passwords are stored encrypted. We do not store financial data.</li>
-  </ul>
-
-  <h2>3. Why we collect this data</h2>
-  <ul>
-    <li>GA4 — to understand how the app is used and improve features (legitimate interest / consent).</li>
-    <li>Supabase account — to save your shift pattern between sessions (performance of a contract/service).</li>
-  </ul>
-
-  <h2>4. Cookies</h2>
-  <p>
-    We use analytics cookies (Google Analytics) <strong>only if you accept</strong> via the banner on the site. You can withdraw consent at any time by clearing your browser data (Settings → Clear site data) or declining on your next visit.
+    LazyShift is operated by <strong>Ibram Enghin</strong>, an individual (not a company) based in Romania, who is the data controller
+    for the personal data described in this policy.
   </p>
   <p>
-    Both lazyshift.com and app.lazyshift.com show this banner, and your choice is stored separately on each: accepting or declining on one site does not apply to the other.
+    Contact: <a href="mailto:dev.lazylabs@gmail.com">dev.lazylabs@gmail.com</a>.
+    Postal address available on request by email to <a href="mailto:dev.lazylabs@gmail.com">dev.lazylabs@gmail.com</a>.
   </p>
-  <p>We do not use advertising or third-party tracking cookies for any other purpose.</p>
 
-  <h2>5. How long we keep data</h2>
+  <h2>2. What data we collect and why</h2>
+  <div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th>Data</th><th>Purpose</th><th>Lawful basis (GDPR Art. 6)</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Account data</strong>: email address and password. Passwords are stored <strong>hashed</strong> by our authentication provider (Supabase Auth) — we never see or store them in readable form. Supabase also keeps sign-in records (such as IP address and time) for security.</td>
+        <td>Creating and securing your account, signing you in, password resets.</td>
+        <td>Performance of a contract (Art. 6(1)(b)); security records: legitimate interests (Art. 6(1)(f)) in keeping the service secure.</td>
+      </tr>
+      <tr>
+        <td><strong>Account profile</strong>: your account ID, email address, the date your free trial ends and, once Pro is available, whether you have Pro, when it expires and your Lemon Squeezy subscription ID.</td>
+        <td>Running your free trial and deciding which features your account can use.</td>
+        <td>Performance of a contract (Art. 6(1)(b)).</td>
+      </tr>
+      <tr>
+        <td><strong>Schedule data</strong>: shift pattern and start date, annual-leave and sick-leave days you mark, custom working days and hours, shift start time and your device's time zone.</td>
+        <td>Saving your calendar and syncing it across your devices; working out when to send reminders.</td>
+        <td>Performance of a contract (Art. 6(1)(b)).</td>
+      </tr>
+      <tr>
+        <td><strong>Push notification subscription</strong>: the push address and encryption keys your browser creates when you turn on shift reminders, and a record of when each reminder was sent.</td>
+        <td>Sending the shift reminders you asked for, without duplicates.</td>
+        <td>Consent (Art. 6(1)(a)), given through your browser's notification prompt. You can withdraw it at any time in your browser settings.</td>
+      </tr>
+      <tr>
+        <td><strong>PDF export email</strong>: if you use the app without an account, the email address you enter in the "Free PDF export" form and the date you entered it.</td>
+        <td>Registering you for free PDF exports. We do not send marketing emails to this address.</td>
+        <td>Performance of a contract (Art. 6(1)(b)).</td>
+      </tr>
+      <tr>
+        <td><strong>Subscription data</strong> (once Pro is on sale): Lemon Squeezy tells us when a subscription starts, renews, is cancelled or ends, including the email address used at checkout. We use the email to find your account and store only the profile fields listed above. We never receive your card details.</td>
+        <td>Giving you Pro access after you pay and ending it when the subscription ends; keeping billing records.</td>
+        <td>Performance of a contract (Art. 6(1)(b)); legal obligation for accounting records (Art. 6(1)(c)).</td>
+      </tr>
+      <tr>
+        <td><strong>Analytics data</strong> (only if you accept cookies): pages visited, session duration, device and browser type, approximate location, collected by Google Analytics 4.</td>
+        <td>Understanding how LazyShift is used so we can improve it.</td>
+        <td>Consent (Art. 6(1)(a)), given through the cookie banner, as required by the ePrivacy rules (in Romania, Law no. 506/2004; in the UK, the Privacy and Electronic Communications Regulations).</td>
+      </tr>
+      <tr>
+        <td><strong>Emails you send us</strong>.</td>
+        <td>Answering support, refund and data-protection requests.</td>
+        <td>Legitimate interests (Art. 6(1)(f)); legal obligation where you exercise your rights.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p>
+    The salary calculator runs entirely in your browser: the salary figures you enter are not sent to us.
+    We do not make automated decisions about you that have legal or similarly significant effects.
+  </p>
+
+  <h2 id="cookies">3. Cookies and local storage</h2>
+  <p>
+    <strong>Analytics cookies</strong> (Google Analytics, <code>_ga</code> and <code>_ga_*</code>) are set
+    <strong>only if you click Accept</strong> in the cookie banner. Until then Google Analytics is not loaded at all.
+    You can change your choice at any time with the <strong>Cookie settings</strong> link at the bottom of every page;
+    if you withdraw consent we delete the analytics cookies we can reach.
+    Your choice is stored separately on lazyshift.com and app.lazyshift.com.
+  </p>
+  <p>
+    We also use your browser's local storage for things that are strictly necessary for the service or that you asked for,
+    which do not need consent: your sign-in session, your cookie choice, your light/dark theme, the email you entered for
+    PDF exports, and whether you have used your free salary calculation.
+  </p>
+  <p>We do not use advertising cookies or any advertising or cross-site tracking technology.</p>
+
+  <h2>4. Who we share data with</h2>
+  <p>We do not sell your personal data. We share it only with the service providers we need to run LazyShift:</p>
   <ul>
-    <li>GA4 data — 14 months (Google Analytics default setting).</li>
-    <li>Supabase account data — for as long as your account is active. You can request deletion at any time.</li>
+    <li><strong>Supabase</strong> — database and authentication. Your data is stored in Supabase's West EU (Ireland) region. (<a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase privacy policy</a>)</li>
+    <li><strong>Cloudflare</strong> — DNS and proxy for our domains; it processes your IP address and request data to deliver and protect the site. (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare privacy policy</a>)</li>
+    <li><strong>GitHub Pages</strong> — static hosting of the website and app. (<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub privacy statement</a>)</li>
+    <li><strong>Vercel</strong> — serverless functions, such as the one that will receive subscription notifications from Lemon Squeezy. (<a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel privacy policy</a>)</li>
+    <li><strong>Lemon Squeezy</strong> — payments, once Pro is launched. Lemon Squeezy will act as our reseller and Merchant of Record: it collects your payment and billing details directly and processes them under its own <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener">privacy policy</a>.</li>
+    <li><strong>Google Analytics</strong> (Google Ireland Ltd / Google LLC) — website analytics, only after you consent. (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google privacy policy</a>)</li>
+    <li><strong>jsDelivr</strong> — content delivery network that serves the Supabase JavaScript library; it processes your IP address to deliver the file.</li>
+    <li><strong>Your browser's push service</strong> (for example Google, Apple or Mozilla) — delivers shift reminders if you turn them on.</li>
+  </ul>
+  <p>We may also disclose data where the law requires it or to protect our legal rights.</p>
+
+  <h2>5. International transfers</h2>
+  <p>
+    Our database is in the European Union (Ireland). The UK recognises the EU as providing adequate protection, so
+    data of UK users can be held there.
+    Some other providers (including Cloudflare, GitHub, Vercel, Google, Lemon Squeezy and jsDelivr's network) may process
+    data in the United States or other countries outside the EU and the UK. Where they do, the transfer is protected by an
+    adequacy decision (including the EU–US Data Privacy Framework and its UK Extension, where the provider is certified) or by
+    the European Commission's Standard Contractual Clauses, together with the UK International Data Transfer Addendum for
+    UK users' data. You can ask us for more information.
+  </p>
+
+  <h2>6. How long we keep data</h2>
+  <ul>
+    <li><strong>Account, profile and schedule data</strong> — until your account is deleted, then removed within 30 days.</li>
+    <li><strong>Push subscriptions and reminder records</strong> — until you turn off notifications for LazyShift in your browser, the browser withdraws the subscription, or your account is deleted.</li>
+    <li><strong>Billing records</strong> — 6 years.</li>
+    <li><strong>PDF export email</strong> — until you ask us to delete it.</li>
+    <li><strong>Support emails</strong> — 2 years.</li>
+    <li><strong>Google Analytics data</strong> — for the retention period set in Google Analytics, at most 14 months.</li>
   </ul>
 
-  <h2>6. Who we share data with</h2>
-  <p>We do not sell or share your data with third parties, except the service providers we use:</p>
+  <h2>7. Your rights</h2>
+  <p>Under the GDPR (and, for UK users, UK GDPR) you have the right to:</p>
   <ul>
-    <li><strong>Google Analytics</strong> — traffic analysis (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google privacy policy</a>)</li>
-    <li><strong>Supabase</strong> — account storage (<a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase privacy policy</a>)</li>
-    <li><strong>GitHub Pages / Cloudflare</strong> — hosting and CDN</li>
+    <li>access the personal data we hold about you;</li>
+    <li>have inaccurate data corrected;</li>
+    <li>have your data erased;</li>
+    <li>restrict or object to our processing;</li>
+    <li>receive your data in a portable format;</li>
+    <li>withdraw consent at any time, where we rely on consent (this does not affect processing that happened before).</li>
   </ul>
+  <p>
+    <strong>To delete your account and data</strong>, or to exercise any other right, email
+    <a href="mailto:dev.lazylabs@gmail.com?subject=Data%20request">dev.lazylabs@gmail.com</a> from the email address
+    linked to your account. We reply within one month.
+  </p>
 
-  <h2>7. Your rights (GDPR)</h2>
-  <p>Under EU Regulation 2016/679, you have the right to:</p>
+  <h2>8. Complaints</h2>
+  <p>
+    If you are unhappy with how we handle your data, please contact us first. You also have the right to complain to a
+    data protection supervisory authority:
+  </p>
   <ul>
-    <li>Access your data</li>
-    <li>Rectify incorrect data</li>
-    <li>Erase your data ("right to be forgotten")</li>
-    <li>Object to processing</li>
-    <li>Data portability</li>
+    <li>the Romanian National Supervisory Authority for Personal Data Processing (ANSPDCP): <a href="https://www.dataprotection.ro" target="_blank" rel="noopener">www.dataprotection.ro</a>;</li>
+    <li>if you are in the UK, the Information Commissioner's Office (ICO): <a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener">ico.org.uk/make-a-complaint</a>, 0303 123 1113.</li>
   </ul>
-  <p>For any request, write to: <a href="mailto:contact@lazyshift.com">contact@lazyshift.com</a></p>
+  <p>If you live in another EU country, you can also complain to the supervisory authority there.</p>
 
-  <h2>8. Changes</h2>
-  <p>This policy may be updated. The date of the last modification is shown at the top of this page.</p>
+  <h2>9. Children</h2>
+  <p>LazyShift is intended for working adults and is not directed at children under 16.</p>
+
+  <h2>10. Security</h2>
+  <p>
+    Data is sent over HTTPS, access to our database is limited to the services that need it, and passwords are hashed by Supabase Auth.
+  </p>
+
+  <h2>11. Changes</h2>
+  <p>We may update this policy. The date at the top shows the latest version; we will tell you about significant changes before they take effect.</p>
 </div>
+
+  <footer class="site-footer">
+    <a href="/terms.html">Terms of Service</a>
+    <a href="/refund.html">Refunds &amp; Cancellation</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <button type="button" onclick="openCookieSettings()">Cookie settings</button>
+  </footer>
 </body>
 </html>
