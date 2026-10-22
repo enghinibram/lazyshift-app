@@ -5,11 +5,9 @@
 // downloaded after the visitor clicks Accept.
 // ============================================================
 
-// LazyShift's own GA4 property — the single place the ID is defined.
-// [TODO: new GA4 measurement ID] Replace the placeholder with the
-// measurement ID of the new LazyShift-only GA4 property (G-XXXXXXXXXX).
-// While it is the placeholder, no analytics script is ever loaded.
-const LAZYSHIFT_GA4_ID = 'G-XXXXXXXXXX'
+// LazyShift's own GA4 property (app.lazyshift.com only) — the single
+// place the ID is defined.
+const LAZYSHIFT_GA4_ID = 'G-7T5CW2E1Z6'
 
 ;(function () {
   const STORAGE_KEY = 'cookie_consent'   // 'accepted' | 'rejected'
