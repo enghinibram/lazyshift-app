@@ -483,7 +483,7 @@
         ✅ Unlimited PDF exports<br>
         ✅ No credit card required
       </div>
-      <a href="/login.html" style="
+      <a href="/login.html" id="salary-trial-btn" style="
         display:block; background:#4ade80; color:#000;
         text-decoration:none; border-radius:10px;
         padding:13px; font-size:15px; font-weight:700; margin-bottom:10px;">
@@ -524,6 +524,9 @@
         const overlay = document.getElementById('salary-upgrade-overlay')
         const title   = document.getElementById('salary-overlay-title')
         const sub     = document.getElementById('salary-overlay-sub')
+        const trial   = document.getElementById('salary-trial-btn')
+        // The trial is offered only to guests; an expired user already had it.
+        trial.style.display = status === 'expired' ? 'none' : 'block'
         if (status === 'expired') {
           title.textContent = 'Trial ended'
           sub.textContent   = 'Pro, with unlimited salary calculations and full year access, is coming soon.'

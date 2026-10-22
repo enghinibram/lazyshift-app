@@ -184,11 +184,18 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
   // ── Upgrade Overlay ──────────────────────────────────────
 
   function showUpgradeOverlay(access, reason) {
+    // Pro already has everything: there is nothing to upgrade to.
+    if (access.isPro) return
+
     let title, subtitle
 
     if (!access.loggedIn) {
       title    = 'Sign in to continue'
       subtitle = 'Create a free account and get 30 days of full access — no credit card required.'
+    } else if (access.isTrialActive) {
+      const days = `${access.trialDaysLeft} day${access.trialDaysLeft !== 1 ? 's' : ''}`
+      title    = 'LazyShift Pro'
+      subtitle = `Your free trial has ${days} left, with everything below included. Pro is coming soon.`
     } else {
       title    = 'Your trial has ended'
       subtitle = reason === 'month'
@@ -196,9 +203,19 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
         : 'Pro, with unlimited PDF exports and full year access, is coming soon.'
     }
 
+    // The free trial is offered only to guests.
+    const offerTrial = !access.loggedIn
+    document.getElementById('upgrade-trial-btn').style.display  = offerTrial ? 'block' : 'none'
+    document.getElementById('upgrade-trial-note').style.display = offerTrial ? '' : 'none'
+
     document.getElementById('upgrade-title').textContent    = title
     document.getElementById('upgrade-subtitle').textContent = subtitle
     document.getElementById('upgrade-overlay').style.display = 'flex'
+  }
+
+  // Banner link: the overlay for the current status.
+  window.openUpgradeOverlay = function () {
+    showUpgradeOverlay(Auth.getAccessLevel())
   }
 
   window.closeUpgradeOverlay = function () {
@@ -262,6 +279,8 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
 
     if (access.isPro) {
       banner.style.display = 'none'
+      const overlay = document.getElementById('upgrade-overlay')
+      if (overlay) overlay.style.display = 'none'
       return
     }
 
@@ -269,8 +288,8 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
       banner.style.display = 'flex'
       banner.innerHTML = `
         <span>🎁 Free trial · <strong>${access.trialDaysLeft} day${access.trialDaysLeft !== 1 ? 's' : ''} left</strong></span>
-        <a href="#" onclick="document.getElementById('upgrade-overlay').style.display='flex'; return false"
-           style="color:#4ade80; font-weight:700; text-decoration:none; font-size:12px;">Upgrade →</a>
+        <a href="#" onclick="openUpgradeOverlay(); return false"
+           style="color:#4ade80; font-weight:700; text-decoration:none; font-size:12px;">See Pro →</a>
       `
       return
     }
@@ -281,8 +300,8 @@ const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ
     banner.style.borderColor = 'rgba(248,113,113,0.3)'
     banner.innerHTML = `
       <span>⏰ Trial ended · limited access</span>
-      <a href="#" onclick="document.getElementById('upgrade-overlay').style.display='flex'; return false"
-         style="color:#f87171; font-weight:700; text-decoration:none; font-size:12px;">Upgrade →</a>
+      <a href="#" onclick="openUpgradeOverlay(); return false"
+         style="color:#f87171; font-weight:700; text-decoration:none; font-size:12px;">See Pro →</a>
     `
   }
 
