@@ -33,6 +33,8 @@
     .privacy-wrap table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.5; margin: 0.75rem 0; }
     .privacy-wrap th, .privacy-wrap td { text-align: left; vertical-align: top; padding: 8px; border-bottom: 1px solid rgba(128,128,128,0.25); }
     .table-scroll { overflow-x: auto; }
+    .storage-table td:first-child { width: 34%; }
+    .storage-table code { overflow-wrap: anywhere; }
     .back-link { display: inline-block; margin-bottom: 2rem; color: #1D9E75; text-decoration: none; font-weight: 600; }
     .back-link:hover { text-decoration: underline; }
     .updated { font-size: 13px; color: #888; margin-bottom: 2rem; }
@@ -44,7 +46,7 @@
 <div class="privacy-wrap">
   <a class="back-link" href="/">← Back to LazyShift</a>
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: 20 October 2026</p>
+  <p class="updated">Last updated: 22 October 2026</p>
 
   <p>
     This policy explains what personal data LazyShift collects when you use
@@ -129,11 +131,71 @@
     You can change your choice at any time with the <strong>Cookie settings</strong> link at the bottom of every page;
     if you withdraw consent we delete the analytics cookies we can reach.
     Your choice is stored separately on lazyshift.com and app.lazyshift.com.
+    Apart from these analytics cookies, LazyShift's code does not set any cookies.
   </p>
   <p>
-    We also use your browser's local storage for things that are strictly necessary for the service or that you asked for,
-    which do not need consent: your sign-in session, your cookie choice, your light/dark theme, the email you entered for
-    PDF exports, and whether you have used your free salary calculation.
+    The app also keeps some data in your browser's <strong>local storage</strong>, on your device. It does this so you can
+    use the app offline, and to remember your theme, your cookie choice and the free features you have used. We do not use
+    session storage. These items are strictly necessary for the service or something you asked for, so they do not need consent:
+  </p>
+  <div class="table-scroll">
+  <table class="storage-table">
+    <thead>
+      <tr><th>Key</th><th>What it holds and why</th><th>When it is removed</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>sb-tmkrbnkztmohfoohbgfy-auth-token</code></td>
+        <td>Your sign-in session (sign-in tokens and your account ID and email), created by Supabase Auth when you sign in. It keeps you signed in, including when you are offline.</td>
+        <td>When you sign out.</td>
+      </tr>
+      <tr>
+        <td><code>lazyshift-profile</code></td>
+        <td>Your account ID, whether you have Pro, when your trial ends and when Pro expires, so the app knows which features you can use while offline.</td>
+        <td>When you sign out.</td>
+      </tr>
+      <tr>
+        <td><code>lazyshift-settings</code></td>
+        <td>A copy of the schedule data described in section 2, so your calendar still shows when you are offline.</td>
+        <td>When you sign out.</td>
+      </tr>
+      <tr>
+        <td><code>lazyshift-theme</code></td>
+        <td>Whether you chose the light or dark theme.</td>
+        <td>When you clear site data.</td>
+      </tr>
+      <tr>
+        <td><code>cookie_consent</code></td>
+        <td>Whether you accepted or rejected analytics cookies.</td>
+        <td>When you clear site data.</td>
+      </tr>
+      <tr>
+        <td><code>lazyshift-pdf-email</code>, <code>lazyshift-pdf-date</code></td>
+        <td>The email you entered for free PDF exports and the date you entered it, so free PDF exports work on this device for a year without asking again.</td>
+        <td>When you clear site data.</td>
+      </tr>
+      <tr>
+        <td><code>lazyshift-salary-used</code></td>
+        <td>A marker that you have used your free salary calculation.</td>
+        <td>When you clear site data.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p>
+    The app's service worker also keeps an <strong>offline cache</strong> (named <code>lazyshift-v</code> followed by a version number)
+    with copies of the app's own pages, scripts, styles, icons and the Supabase library, so the app opens without a network
+    connection. It contains no personal data. Each new version of the app replaces it, and it is removed when you clear site data.
+  </p>
+  <p>
+    Unlike cookies, local storage and the offline cache are not sent automatically with requests to any server; the app reads
+    them in your browser. The one exception is your sign-in session, which the Supabase library uses to authenticate your
+    requests to Supabase. Data you save to your account, such as your schedule, and the PDF export email are sent to us
+    separately, as described in section 2.
+  </p>
+  <p>
+    <strong>To clear this data</strong>, sign out (this needs an internet connection) to remove your session, profile and schedule copy,
+    or clear the site data for app.lazyshift.com in your browser's settings to remove everything listed here, including the offline cache.
   </p>
   <p>We do not use advertising cookies or any advertising or cross-site tracking technology.</p>
 
