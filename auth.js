@@ -38,7 +38,9 @@ const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac2
 
     getUserStatus() {
       if (!this.user) return 'guest'
-      const { is_pro, premium_expires, trial_ends_at } = this.profile || {}
+      // Signed in but public.users not read yet — never treat as expired.
+      if (!this.profile) return 'loading'
+      const { is_pro, premium_expires, trial_ends_at } = this.profile
       // premium_expires is set by the webhook (renewal date + grace, or
       // ends_at once cancelled) — past it, Pro no longer counts even if an
       // expiry webhook was missed. Offline it's checked against the local
@@ -51,6 +53,7 @@ const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac2
     getAccessLevel() {
       const status = this.getUserStatus()
       if (status === 'guest')   return { canAccessAll: false, isPro: false, isTrialActive: false, trialDaysLeft: 0, loggedIn: false }
+      if (status === 'loading') return { canAccessAll: false, isPro: false, isTrialActive: false, trialDaysLeft: 0, loggedIn: true, loading: true }
       if (status === 'pro')     return { canAccessAll: true,  isPro: true,  isTrialActive: false, trialDaysLeft: 0, loggedIn: true }
       if (status === 'trial') {
         const trialDaysLeft = Math.ceil((new Date(this.profile.trial_ends_at) - new Date()) / 86400000)
@@ -120,57 +123,58 @@ const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac2
       try { return JSON.parse(localStorage.getItem(SB_STORAGE_KEY))?.user || null } catch { return null }
     },
 
-    async _getOrCreateProfile(user) {
+    // The row (with the 30-day trial) is created by the auth.users trigger
+    // in the database — the client only reads it. Retried briefly in case
+    // it isn't readable yet right after sign-up. Offline, or when Supabase
+    // can't be reached, the last profile seen on this device is used.
+    async _loadProfile(user) {
       this.profileFromCache = false
-      // Offline, don't wait for supabase-js to retry: use the last
-      // profile seen on this device.
-      if (!navigator.onLine) {
-        const cached = readCachedProfile(user.id)
+      const cached = readCachedProfile(user.id)
+      const useCached = () => {
         this.profileFromCache = !!cached
         return cached
       }
+      // Offline, don't wait for supabase-js to retry.
+      if (!navigator.onLine) return useCached()
 
-      let data, error, status
-      try {
-        ({ data, error, status } = await authSb
-          .from('users')
-          .select('*')
-          .eq('id', user.id)
-          .single())
-      } catch (e) {
-        error = e
-        status = 0
+      const delays = [0, 500, 1000, 2000, 4000]
+      for (const delay of delays) {
+        if (delay) await new Promise(r => setTimeout(r, delay))
+        if (this.user?.id !== user.id) return null // signed out meanwhile
+        let data, error
+        try {
+          ({ data, error } = await authSb
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .maybeSingle())
+        } catch (e) {
+          error = e
+        }
+        if (data) {
+          saveCachedProfile(user.id, data)
+          return data
+        }
+        // A failed request (no network, expired token, ...), not a missing
+        // row: the last profile seen on this device, if there is one.
+        if (error && cached) return useCached()
       }
-
-      if (data) {
-        saveCachedProfile(user.id, data)
-        return data
-      }
-
-      // Create a trial only when Supabase says there is no row (PGRST116).
-      // Any other failure (no network = status 0, expired token, ...): use
-      // the last profile seen on this device.
-      if (!error || error.code !== 'PGRST116') {
-        const cached = readCachedProfile(user.id)
-        this.profileFromCache = !!cached
-        return cached
-      }
-
-      // First login — create record with 30-day trial
-      const trialEnds = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-      const { data: created } = await authSb
-        .from('users')
-        .insert({ id: user.id, email: user.email, trial_ends_at: trialEnds })
-        .select()
-        .single()
-
-      if (created) saveCachedProfile(user.id, created)
-      return created || null
+      console.error('auth: users row not found for', user.id)
+      return useCached()
     },
 
     async _onSignIn(user) {
-      this.user    = user
-      this.profile = await this._getOrCreateProfile(user)
+      const sameUser = this.user?.id === user.id
+      this.user = user
+      // Token refresh etc. — already loaded (a cached profile is re-read).
+      if (sameUser && this.profile && !this.profileFromCache) return
+      if (!sameUser) {
+        this.profile = null
+        this._applyAccess() // shows the 'loading' state
+      }
+      const profile = await this._loadProfile(user)
+      if (this.user?.id !== user.id) return // signed out meanwhile
+      this.profile = profile
       this._applyAccess()
     },
 
@@ -312,6 +316,8 @@ const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac2
   // ── Upgrade Overlay ──────────────────────────────────────
 
   function showUpgradeOverlay(access, reason) {
+    // Profile still loading: say nothing rather than "Your trial has ended".
+    if (access.loading) return
     // Pro already has everything: there is nothing to upgrade to.
     if (access.isPro) return
 
@@ -399,6 +405,11 @@ const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac2
     if (!banner) return
 
     const access = Auth.getAccessLevel()
+
+    if (access.loading) {
+      banner.style.display = 'none'
+      return
+    }
 
     if (!access.loggedIn) {
       banner.style.display = 'flex'

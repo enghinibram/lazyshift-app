@@ -518,8 +518,19 @@
   <script>
     const SALARY_USED_KEY = 'lazyshift-salary-used'
 
-    function tryCalculate() {
-      const status = window.Auth ? window.Auth.getUserStatus() : 'guest'
+    async function tryCalculate() {
+      let status = window.Auth ? window.Auth.getUserStatus() : 'guest'
+
+      // Account still loading — wait for it instead of treating the user
+      // as a guest/expired one (that would burn the free calculation).
+      if (status === 'loading') {
+        await window.Auth.ready
+        status = window.Auth.getUserStatus()
+        if (status === 'loading') {
+          alert('Still loading your account — please try again in a moment.')
+          return
+        }
+      }
 
       if (status === 'trial' || status === 'pro') {
         calculate()
