@@ -67,6 +67,10 @@ select count(*) as auth_users_without_row
 -- 9) Rows that look self-granted under the old permissions — review by hand.
 --    is_pro without any Lemon Squeezy subscription, or a trial longer
 --    than 30 days after account creation.
+--    Best run BEFORE the backfill (A2): afterwards every backfilled
+--    account also matches the trial rule. Backfilled rows are easy to
+--    spot — they all share the exact same trial_ends_at (now() is fixed
+--    for the whole backfill statement).
 select pu.id, pu.email, pu.is_pro, pu.premium_expires, pu.trial_ends_at,
        pu.lemon_squeezy_subscription_id, au.created_at
   from public.users pu
