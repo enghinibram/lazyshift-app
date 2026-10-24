@@ -1,0 +1,2 @@
+# Tests are not deployed (Vercel already skips _-prefixed paths under api/).
+api/__tests__
