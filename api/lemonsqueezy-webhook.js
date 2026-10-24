@@ -132,6 +132,24 @@ async function findUserIdByEmail(supabaseUrl, supabaseSecretKey, email) {
   return res.json(); // uuid string or null
 }
 
+// Paid with no matching account: keep the computed state so the
+// auth.users trigger can apply it once that email signs up and confirms.
+// Redeliveries hit the (email, event, event_updated_at) unique key and
+// are ignored.
+async function storePendingEntitlement(supabaseUrl, supabaseSecretKey, entry) {
+  const res = await fetch(
+    `${supabaseUrl}/rest/v1/pending_entitlements?on_conflict=email,event,event_updated_at`,
+    {
+      method: 'POST',
+      headers: supabaseHeaders(supabaseSecretKey, { Prefer: 'resolution=ignore-duplicates,return=minimal' }),
+      body: JSON.stringify(entry),
+    }
+  );
+  if (!res.ok) {
+    throw new Error(`INSERT pending_entitlements failed: ${res.status} ${await res.text()}`);
+  }
+}
+
 // Conditional PATCH: only applies when the event is newer than the last one
 // applied (users.ls_updated_at), so retried or out-of-order deliveries can't
 // roll the state back (e.g. a late subscription_updated after _expired).
@@ -225,15 +243,7 @@ export default async function handler(req, res) {
       userId = await findUserIdByEmail(supabaseUrl, supabaseSecretKey, attrs.user_email);
     }
 
-    if (!userId) {
-      // Paid but no LazyShift account matches — nothing to update.
-      console.warn('lemonsqueezy-webhook: no account for event', eventName, payload?.data?.id);
-      return res.status(200).json({ warning: 'No account found for this event.' });
-    }
-
-    let filters = { id: `eq.${userId}` };
     let row;
-
     if (isSubscriptionEvent) {
       const { isPro, premiumExpires } = resolvePremiumState(attrs);
       row = {
@@ -242,10 +252,31 @@ export default async function handler(req, res) {
         lemon_squeezy_subscription_id: String(payload.data.id),
       };
     } else {
-      if (eventName === 'subscription_payment_refunded') {
-        filters = { ...filters, lemon_squeezy_subscription_id: `eq.${attrs.subscription_id}` };
-      }
       row = { is_pro: false, premium_expires: new Date().toISOString() };
+    }
+
+    if (!userId) {
+      if (!attrs.user_email) {
+        console.warn('lemonsqueezy-webhook: no account and no email for event', eventName, payload?.data?.id);
+        return res.status(200).json({ warning: 'No account found for this event.' });
+      }
+      await storePendingEntitlement(supabaseUrl, supabaseSecretKey, {
+        email: attrs.user_email.trim().toLowerCase(),
+        event: eventName,
+        payload,
+        is_pro: row.is_pro,
+        premium_expires: row.premium_expires,
+        subscription_id: isSubscriptionEvent
+          ? String(payload.data.id)
+          : (attrs.subscription_id != null ? String(attrs.subscription_id) : null),
+        event_updated_at: eventUpdatedAt,
+      });
+      return res.status(200).json({ ok: true, pending: true, event: eventName });
+    }
+
+    let filters = { id: `eq.${userId}` };
+    if (eventName === 'subscription_payment_refunded') {
+      filters = { ...filters, lemon_squeezy_subscription_id: `eq.${attrs.subscription_id}` };
     }
 
     const applied = await patchUser(supabaseUrl, supabaseSecretKey, filters, eventUpdatedAt, row);
