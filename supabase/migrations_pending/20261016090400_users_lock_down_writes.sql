@@ -1,3 +1,16 @@
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+-- NOT APPLIED YET — DO NOT APPLY THIS MIGRATION YET.
+-- It lives in supabase/migrations_pending/ on purpose: `supabase db push`
+-- only reads supabase/migrations/, so it can't be applied by mistake.
+--
+-- To apply it later (after the client that no longer inserts into
+-- public.users is deployed and every open tab has picked it up):
+--   1. run supabase/verify/users_access.sql and check the results;
+--   2. git mv this file back to supabase/migrations/ (keep its name);
+--   3. supabase db push.
+-- Undo: supabase/rollback/users_access_rollback.sql
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 -- =====================================================================
 -- LAZYSHIFT — Migration B: clients can no longer write public.users
 -- Before: anon and authenticated had INSERT and UPDATE on every column,
