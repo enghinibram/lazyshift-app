@@ -127,11 +127,16 @@
       <a href="/login.html" id="upgrade-trial-btn" class="auth-btn" style="text-decoration:none; text-align:center; display:block; background:#4ade80; color:#000;">
         Start free trial (30 days)
       </a>
-      <button type="button" class="auth-btn" disabled aria-disabled="true"
+      <button type="button" class="auth-btn" disabled aria-disabled="true" data-coming-soon
          style="margin-top:8px; opacity:0.55; cursor:not-allowed;">
         Pro: coming soon
       </button>
-      <p class="legal-note">Paid Pro subscriptions are not on sale yet.<span id="upgrade-trial-note"> The 30-day free trial needs no card.</span>
+      <!-- Shown only when CHECKOUT_ENABLED is true (auth.js) -->
+      <button type="button" class="auth-btn" data-checkout onclick="startCheckout()"
+         style="display:none; width:100%; margin-top:8px;">
+        Upgrade to Pro →
+      </button>
+      <p class="legal-note"><span data-coming-soon>Paid Pro subscriptions are not on sale yet.</span><span id="upgrade-trial-note"> The 30-day free trial needs no card.</span>
         See our <a href="/terms.html" target="_blank">Terms</a> and
         <a href="/privacy.html" target="_blank">Privacy Policy</a>.</p>
       <button class="auth-btn ghost" onclick="closeUpgradeOverlay()">Maybe later</button>

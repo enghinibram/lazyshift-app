@@ -376,6 +376,13 @@
   // Signing in, signing up and password emails all need Supabase.
   const OFFLINE_MSG = "You're offline. Connect to the internet and try again."
 
+  // Where to go once signed in. ?next=upgrade comes from "Upgrade to Pro"
+  // (auth.js startCheckout) — checkout needs an account, so the app reopens
+  // the upgrade options afterwards. Whitelisted: never redirect to a URL
+  // taken from the query string.
+  const NEXT_URLS = { upgrade: 'index.html?upgrade=1' }
+  const APP_URL = NEXT_URLS[new URLSearchParams(window.location.search).get('next')] || 'index.html'
+
   const $ = id => document.getElementById(id)
   const authForm    = $('authForm')
   const forgotForm  = $('forgotForm')
@@ -393,7 +400,7 @@
   ;(async () => {
     if (IS_RECOVERY) { showView('newpass'); return }
     const { data: { session } } = await sb.auth.getSession()
-    if (session) window.location.replace('index.html')
+    if (session) window.location.replace(APP_URL)
   })()
 
   sb.auth.onAuthStateChange((event) => {
@@ -473,7 +480,7 @@
 
   async function signIn(email, password) {
     const { error } = await sb.auth.signInWithPassword({ email, password })
-    if (!error) { window.location.replace('index.html'); return }
+    if (!error) { window.location.replace(APP_URL); return }
 
     if (error.code === 'email_not_confirmed') {
       lastUnconfirmedEmail = email
@@ -506,7 +513,7 @@
     }
 
     // Confirm email disabled in the dashboard → session right away.
-    if (data.session) { window.location.replace('index.html'); return }
+    if (data.session) { window.location.replace(APP_URL); return }
 
     lastUnconfirmedEmail = email
     showMessage('📬', 'Verify your email',
@@ -577,7 +584,7 @@
     history.replaceState(null, '', window.location.pathname)
     showMessage('✅', 'Password saved',
       "You're signed in. Next time, sign in with your email and this password.",
-      'Go to LazyShift →', () => window.location.replace('index.html'))
+      'Go to LazyShift →', () => window.location.replace(APP_URL))
   })
 
   // ── Helpers ─────────────────────────────────────────────────

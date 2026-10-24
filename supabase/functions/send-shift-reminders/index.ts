@@ -285,13 +285,20 @@ async function runReminders() {
 
   // Eligibili: Pro plătit SAU trial încă activ — aceeași regulă ca
   // Auth.getUserStatus() din auth.js ('pro' / 'trial').
-  const { data: eligibleUsers, error: euErr } = await supabase
+  // Pro = is_pro ȘI premium_expires gol sau în viitor (ca în auth.js), ca
+  // un webhook de expirare pierdut să nu lase accesul deschis la nesfârșit.
+  // Query-ul doar restrânge candidații; regula exactă e aplicată mai jos.
+  const { data: candidateUsers, error: euErr } = await supabase
     .from("users")
-    .select("id")
+    .select("id, is_pro, premium_expires, trial_ends_at")
     .or(`is_pro.eq.true,trial_ends_at.gt.${now.toISOString()}`);
   if (euErr) return { success: false, error: euErr.message };
 
-  const eligibleIds = (eligibleUsers ?? []).map((u: { id: string }) => u.id);
+  type UserRow = { id: string; is_pro: boolean | null; premium_expires: string | null; trial_ends_at: string | null };
+  const isEligible = (u: UserRow) =>
+    (u.is_pro === true && (!u.premium_expires || new Date(u.premium_expires) > now)) ||
+    (!!u.trial_ends_at && new Date(u.trial_ends_at) > now);
+  const eligibleIds = ((candidateUsers ?? []) as UserRow[]).filter(isEligible).map((u) => u.id);
   if (eligibleIds.length === 0) return { success: true, checked: 0, sent: 0, skippedTimezone: 0 };
 
   const { data: settingsRows, error: usErr } = await supabase

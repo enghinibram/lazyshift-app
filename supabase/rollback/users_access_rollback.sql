@@ -1,0 +1,51 @@
+-- =====================================================================
+-- LAZYSHIFT — rollback snippets for the public.users lockdown.
+-- NOT a migration. Run only the section for the step you are undoing,
+-- in the SQL editor. Sections are in reverse rollout order.
+-- =====================================================================
+
+-- ---------------------------------------------------------------------
+-- Undo Migration B (20261016090400_users_lock_down_writes)
+-- Restores the pre-lockdown state exactly — including the hole. Only
+-- use it if sign-ups or the app break and you need time to diagnose.
+-- ---------------------------------------------------------------------
+-- grant insert, update on table public.users to anon, authenticated;
+-- create policy "Users can insert own record" on public.users
+--   for insert to public with check (auth.uid() = id);
+-- create policy "Users can update own record" on public.users
+--   for update to public using (auth.uid() = id);
+
+-- ---------------------------------------------------------------------
+-- Undo Migration C (20261016090300_get_user_id_by_email_lockdown)
+-- Not needed by any code path; listed for completeness.
+-- ---------------------------------------------------------------------
+-- grant execute on function public.get_user_id_by_email(text) to anon, authenticated;
+
+-- ---------------------------------------------------------------------
+-- Undo Migration A2 (backfill)
+-- Normally leave it: the rows are harmless. To remove exactly the rows it
+-- created, run this right after the backfill (replace the timestamp with
+-- when you ran it); rows the trigger or webhook touched since are kept.
+-- ---------------------------------------------------------------------
+-- delete from public.users
+--  where is_pro = false
+--    and lemon_squeezy_subscription_id is null
+--    and ls_updated_at is null
+--    and trial_ends_at between timestamptz '2026-10-16 10:00+00' + interval '30 days' - interval '1 minute'
+--                          and timestamptz '2026-10-16 10:00+00' + interval '30 days' + interval '1 minute';
+
+-- ---------------------------------------------------------------------
+-- Undo Migration A (20261016090100_users_signup_trigger)
+-- Only together with (or after) undoing B, and only while the OLD
+-- client is live — the new client no longer creates the row itself.
+-- ---------------------------------------------------------------------
+-- drop trigger if exists on_auth_user_email_confirmed on auth.users;
+-- drop trigger if exists on_auth_user_created on auth.users;
+-- drop function if exists public.handle_auth_user_change();
+
+-- ---------------------------------------------------------------------
+-- Undo pending_entitlements (20261016090000)
+-- Only after the webhook that writes to it has been reverted, otherwise
+-- unmatched payments return 500 and Lemon Squeezy keeps retrying.
+-- ---------------------------------------------------------------------
+-- drop table if exists public.pending_entitlements;
