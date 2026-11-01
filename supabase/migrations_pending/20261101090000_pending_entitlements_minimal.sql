@@ -1,16 +1,19 @@
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 -- NOT APPLIED YET — DO NOT APPLY THIS MIGRATION YET.
--- It lives in supabase/migrations_pending/ on purpose: `supabase db push`
--- only reads supabase/migrations/, so it can't be applied by mistake.
+-- It lives in supabase/migrations_pending/ on purpose and stays there:
+-- it is applied by hand from the Supabase SQL Editor, not by
+-- `supabase db push`. The SQL Editor does not record it in Supabase's
+-- migration history.
 --
 -- Apply it BEFORE the webhook that stops sending `payload` is deployed
 -- (i.e. before the PR is merged, if main auto-deploys to Vercel):
 -- until this runs, payload is NOT NULL and every unmatched payment
 -- would return 500 and be retried by Lemon Squeezy.
 --   1. run the "before" queries in supabase/verify/pending_entitlements.sql;
---   2. git mv this file back to supabase/migrations/ (keep its name);
---   3. supabase db push;
---   4. run the "after" queries in the same verify file.
+--   2. in the SQL Editor, paste `begin;`, then everything below from
+--      `alter table` through the closing `);` of cron.schedule, then
+--      `commit;`, and run it as one script;
+--   3. run the "after" queries in the same verify file.
 -- Undo: supabase/rollback/pending_entitlements_rollback.sql
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -35,10 +35,12 @@ migration → webhook is safe in that order and only in that order.
 1. **Before** — in the SQL editor, run queries 1–4 of the verify file and note
    the results: both extensions present; the counts from query 2; `payload`
    is_nullable = `NO`; no `purge-pending-entitlements-daily` job yet.
-2. **Apply** — `git mv` the migration to `supabase/migrations/` (same name),
-   then `supabase db push`. If Migration B is still pending, its timestamp is
-   earlier than this one; when B is applied later, `supabase db push` will
-   ask for `--include-all` — that is expected.
+2. **Apply** — in the Supabase SQL Editor, paste `begin;`, then everything
+   in the migration from `alter table` through the closing `);` of
+   `cron.schedule`, then `commit;`, and run it as one script. If any
+   statement fails, nothing is committed. Leave the file in
+   `migrations_pending/`: the SQL Editor does not record the migration in
+   Supabase's migration history, so this file is the record that it exists.
 3. **After** — run queries 2–4, 6 and 7 again. Expected: `with_payload = 0`,
    `applied = 0`, `unapplied` the same as before; `payload` is_nullable =
    `YES`; one active job with schedule `17 3 * * *`; query 6 returns no rows;

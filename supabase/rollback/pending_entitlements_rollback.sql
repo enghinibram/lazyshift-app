@@ -5,6 +5,10 @@
 -- What cannot be undone: the cleared payloads and the deleted applied
 -- rows are gone. That is the point of the migration; no backup is kept
 -- on purpose (it would hold the same personal data).
+--
+-- Order: run "Stop the daily purge" BEFORE "Restore NOT NULL".
+-- Otherwise the daily job's `set payload = null` fails on the NOT NULL
+-- column, and its delete does not run either.
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
