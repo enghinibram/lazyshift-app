@@ -249,5 +249,35 @@ test('payment with no matching account goes to pending_entitlements', async () =
   assert.equal(insert.body.is_pro, true)
   assert.equal(insert.body.subscription_id, '5001')
   assert.equal(insert.body.event_updated_at, '2026-10-24T10:00:00.000Z')
+  // Exactly what the auth.users trigger reads — nothing else.
+  assert.deepEqual(Object.keys(insert.body).sort(), [
+    'email', 'event', 'event_updated_at', 'is_pro', 'premium_expires', 'subscription_id',
+  ])
   assert.equal(patchCalls().length, 0)
+})
+
+test('pending row stores no name, card details, portal URLs or full body', async () => {
+  rpcLookupReplies(null)
+  pendingInsertReplies()
+  const res = await deliver(subscriptionEvent('subscription_created', {
+    user_name: 'Jane Worker',
+    card_brand: 'visa',
+    card_last_four: '4242',
+    urls: {
+      update_payment_method: 'https://lazyshift.lemonsqueezy.com/subscription/5001/payment-details?signature=abc',
+      customer_portal: 'https://lazyshift.lemonsqueezy.com/billing?expires=1&signature=def',
+    },
+    first_subscription_item: { price_id: 1, quantity: 1 },
+  }, { userId: null }))
+
+  assert.equal(res.statusCode, 200)
+  assert.equal(res.body.pending, true)
+
+  const insert = calls.find(c => c.url.includes('/pending_entitlements'))
+  assert.ok(insert, 'pending entitlement stored')
+  assert.equal(insert.body.payload, undefined)
+  const stored = JSON.stringify(insert.body)
+  for (const leaked of ['Jane Worker', 'visa', '4242', 'lemonsqueezy.com', 'signature=']) {
+    assert.ok(!stored.includes(leaked), `pending row must not contain ${leaked}`)
+  }
 })
