@@ -1,0 +1,28 @@
+-- =====================================================================
+-- LAZYSHIFT — rollback snippets for 20261101090000_pending_entitlements_minimal.
+-- NOT a migration. Run only the section you need, in the SQL editor.
+--
+-- What cannot be undone: the cleared payloads and the deleted applied
+-- rows are gone. That is the point of the migration; no backup is kept
+-- on purpose (it would hold the same personal data).
+-- =====================================================================
+
+-- ---------------------------------------------------------------------
+-- Stop the daily purge
+-- Unapplied rows then stay until deleted by hand again.
+-- ---------------------------------------------------------------------
+-- select cron.unschedule(jobid)
+--   from cron.job
+--  where jobname = 'purge-pending-entitlements-daily';
+
+-- ---------------------------------------------------------------------
+-- Restore NOT NULL on payload
+-- Normally leave it nullable: both the old and the new webhook work with
+-- a nullable column. Only run this after reverting the webhook to the
+-- version that sends payload — with the new webhook live, every
+-- unmatched payment would return 500 and Lemon Squeezy would keep
+-- retrying.
+-- ---------------------------------------------------------------------
+-- update public.pending_entitlements set payload = '{}'::jsonb where payload is null;
+-- alter table public.pending_entitlements alter column payload set not null;
+-- comment on column public.pending_entitlements.payload is null;
