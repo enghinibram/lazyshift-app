@@ -123,6 +123,8 @@
           ✅ Sync across devices
         </div>
       </div>
+      <!-- Shown only when CHECKOUT_ENABLED is true (auth.js) -->
+      <p data-checkout class="pro-price" style="display:none;">LazyShift Pro, £3/month, VAT included, cancel anytime</p>
 
       <a href="/login.html" id="upgrade-trial-btn" class="auth-btn" style="text-decoration:none; text-align:center; display:block; background:#4ade80; color:#000;">
         Start free trial (30 days)
@@ -176,6 +178,12 @@
       <div class="dropdown-email" id="dropdown-email"></div>
     </div>
     <hr class="dropdown-divider" />
+    <!-- Pro only (auth.js updateManageSubscription) -->
+    <div id="manage-subscription" class="dropdown-manage" style="display:none">
+      <a href="https://lazyshift-uk.lemonsqueezy.com/billing" target="_blank" rel="noopener"
+         title="Opens the Lemon Squeezy customer portal. Use the email you paid with.">Manage subscription</a>
+      <div class="dropdown-hint">Opens the Lemon Squeezy customer portal. Use the email you paid with.</div>
+    </div>
     <button class="dropdown-logout" onclick="doLogout()">🚪 Sign out</button>
   </div>
 
@@ -368,7 +376,7 @@
       <h2>Frequently asked questions</h2>
       <dl class="faq-list">
         <dt>Is it free?</dt>
-        <dd>Yes, the core calculator is free to use, with no ads. A Pro plan with unlimited PDF exports, the full year view and unlimited salary calculations is coming soon. New accounts can try these features free for 30 days, no card needed.</dd>
+        <dd>Yes, the core calculator is free to use, with no ads. LazyShift Pro adds the full year calendar, unlimited PDF exports, the salary calculator and sync across devices for £3/month, VAT included, billed monthly through Lemon Squeezy. You can cancel any time. New accounts can try these features free for 30 days, no card needed.</dd>
 
         <dt>Does it work on mobile?</dt>
         <dd>Yes — it can be installed as an app on Android and iOS directly from your browser, no App Store needed.</dd>

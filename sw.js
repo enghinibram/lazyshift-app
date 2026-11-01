@@ -1,4 +1,4 @@
-const CACHE = 'lazyshift-v45';
+const CACHE = 'lazyshift-v46';
 
 // The whole app shell, so the app starts with no network after one
 // online visit. The Supabase library is self-hosted under a versioned
