@@ -134,8 +134,9 @@ async function findUserIdByEmail(supabaseUrl, supabaseSecretKey, email) {
 
 // Paid with no matching account: keep the computed state so the
 // auth.users trigger can apply it once that email signs up and confirms.
-// Redeliveries hit the (email, event, event_updated_at) unique key and
-// are ignored.
+// Only what the trigger reads is stored — never the webhook body (name,
+// card brand / last 4, portal URLs, amounts). Redeliveries hit the
+// (email, event, event_updated_at) unique key and are ignored.
 async function storePendingEntitlement(supabaseUrl, supabaseSecretKey, entry) {
   const res = await fetch(
     `${supabaseUrl}/rest/v1/pending_entitlements?on_conflict=email,event,event_updated_at`,
@@ -263,7 +264,6 @@ export default async function handler(req, res) {
       await storePendingEntitlement(supabaseUrl, supabaseSecretKey, {
         email: attrs.user_email.trim().toLowerCase(),
         event: eventName,
-        payload,
         is_pro: row.is_pro,
         premium_expires: row.premium_expires,
         subscription_id: isSubscriptionEvent

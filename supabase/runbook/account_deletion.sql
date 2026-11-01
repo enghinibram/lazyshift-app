@@ -1,0 +1,20 @@
+-- =====================================================================
+-- LAZYSHIFT — manual account-deletion runbook: pending entitlements.
+-- NOT a migration. Run in the SQL editor as part of handling a deletion
+-- request, BEFORE deleting the auth user: deleting the user sets
+-- applied_user_id to null, after which only the email still matches.
+--
+-- Replace both placeholders. Ask the person for every email they may
+-- have used at checkout — the Lemon Squeezy checkout email can differ
+-- from the LazyShift account email — and run once per email. If there is
+-- no LazyShift account (paid but never signed up), drop the
+-- applied_user_id condition.
+--
+-- `returning` lists what was removed; keep the count (not the rows) in
+-- the deletion log.
+-- =====================================================================
+
+-- delete from public.pending_entitlements
+--  where email = lower(trim('person@example.com'))
+--     or applied_user_id = '00000000-0000-0000-0000-000000000000'
+-- returning id, event, created_at;
