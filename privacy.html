@@ -46,7 +46,7 @@
 <div class="privacy-wrap">
   <a class="back-link" href="/">← Back to LazyShift</a>
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: 22 October 2026</p>
+  <p class="updated">Last updated: 2 November 2026</p>
 
   <p>
     This policy explains what personal data LazyShift collects when you use
@@ -82,7 +82,7 @@
         <td>Performance of a contract (Art. 6(1)(b)); security records: legitimate interests (Art. 6(1)(f)) in keeping the service secure.</td>
       </tr>
       <tr>
-        <td><strong>Account profile</strong>: your account ID, email address, the date your free trial ends and, once Pro is available, whether you have Pro, when it expires and your Lemon Squeezy subscription ID.</td>
+        <td><strong>Account profile</strong>: your account ID, email address, the date your free trial ends and, if you subscribe to Pro, whether you have Pro, when it expires, your Lemon Squeezy subscription ID and the time of the last Lemon Squeezy update applied to your account.</td>
         <td>Running your free trial and deciding which features your account can use.</td>
         <td>Performance of a contract (Art. 6(1)(b)).</td>
       </tr>
@@ -102,9 +102,14 @@
         <td>Performance of a contract (Art. 6(1)(b)).</td>
       </tr>
       <tr>
-        <td><strong>Subscription data</strong> (once Pro is on sale): Lemon Squeezy tells us when a subscription starts, renews, is cancelled or ends, including the email address used at checkout. We use the email to find your account and store only the profile fields listed above. We never receive your card details.</td>
+        <td><strong>Subscription data</strong>: when you choose "Upgrade to Pro", the Lemon Squeezy checkout opens with your account email and account ID filled in. Lemon Squeezy then tells us when a subscription starts, renews, is cancelled, ends or is refunded. We find your account by the account ID or, if it is missing, by the email address used at checkout, and store only the Pro fields listed under "Account profile" above. If no account matches, we keep a short record for up to 90 days instead, described in the next row. Lemon Squeezy's notifications include the card type and its last four digits, but we do not store them, and we never receive your full card number.</td>
         <td>Giving you Pro access after you pay and ending it when the subscription ends; keeping billing records.</td>
         <td>Performance of a contract (Art. 6(1)(b)); legal obligation for accounting records (Art. 6(1)(c)).</td>
+      </tr>
+      <tr>
+        <td><strong>Payments without a matching account</strong>: if Lemon Squeezy tells us about a payment and we cannot match it to a LazyShift account (for example you paid before signing up, or with another email), we keep only the email address used at checkout, the name of the event, the Pro status and expiry date we worked out, the Lemon Squeezy subscription ID (if there is one) and the time of the event. We do not keep your name, your card details, links to manage the subscription or a copy of the notification. When an account with that email address is created and the email address is confirmed, we apply the Pro status to it, and a daily clean-up job (at 03:17 UTC) then deletes the record. Records that are never applied to an account are deleted after 90 days.</td>
+        <td>Giving you the Pro access you paid for once you have an account.</td>
+        <td>Performance of a contract (Art. 6(1)(b)).</td>
       </tr>
       <tr>
         <td><strong>Analytics data</strong> (only if you accept cookies): pages visited, session duration, device and browser type, approximate location, collected by Google Analytics 4.</td>
@@ -135,8 +140,8 @@
   </p>
   <p>
     The app also keeps some data in your browser's <strong>local storage</strong>, on your device. It does this so you can
-    use the app offline, and to remember your theme, your cookie choice and the free features you have used. We do not use
-    session storage. These items are strictly necessary for the service or something you asked for, so they do not need consent:
+    use the app offline, and to remember your theme, your cookie choice and the free features you have used. Session storage
+    holds one item, <code>lazyshift-checkout-started</code>, listed below. These items are strictly necessary for the service or something you asked for, so they do not need consent:
   </p>
   <div class="table-scroll">
   <table class="storage-table">
@@ -153,6 +158,11 @@
         <td><code>lazyshift-profile</code></td>
         <td>Your account ID, whether you have Pro, when your trial ends and when Pro expires, so the app knows which features you can use while offline.</td>
         <td>When you sign out.</td>
+      </tr>
+      <tr>
+        <td><code>lazyshift-checkout-started</code> (session storage)</td>
+        <td>The time you opened the Lemon Squeezy checkout, so the app can check for your Pro access when you come back to it.</td>
+        <td>When Pro shows up in the app, or when you close the tab.</td>
       </tr>
       <tr>
         <td><code>lazyshift-settings</code></td>
@@ -205,8 +215,8 @@
     <li><strong>Supabase</strong> — database and authentication. Your data is stored in Supabase's West EU (Ireland) region. (<a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase privacy policy</a>)</li>
     <li><strong>Cloudflare</strong> — DNS and proxy for our domains; it processes your IP address and request data to deliver and protect the site. (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare privacy policy</a>)</li>
     <li><strong>GitHub Pages</strong> — static hosting of the website and app. (<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub privacy statement</a>)</li>
-    <li><strong>Vercel</strong> — hosts the serverless function that will receive subscription notifications from Lemon Squeezy once Pro is on sale. The app itself does not call it. (<a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel privacy policy</a>)</li>
-    <li><strong>Lemon Squeezy</strong> — payments, once Pro is launched. Lemon Squeezy will act as our reseller and Merchant of Record: it collects your payment and billing details directly and processes them under its own <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener">privacy policy</a>.</li>
+    <li><strong>Vercel</strong> — hosts the serverless function that receives subscription notifications from Lemon Squeezy. The app itself does not call it. (<a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel privacy policy</a>)</li>
+    <li><strong>Lemon Squeezy</strong> — payments for LazyShift Pro. Lemon Squeezy acts as our reseller and Merchant of Record: it collects your payment and billing details directly and processes them under its own <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener">privacy policy</a>.</li>
     <li><strong>Google Analytics</strong> (Google Ireland Ltd / Google LLC) — website analytics, only after you consent. (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google privacy policy</a>)</li>
     <li><strong>Your browser's push service</strong> (for example Google, Apple or Mozilla) — delivers shift reminders if you turn them on.</li>
   </ul>
@@ -228,6 +238,7 @@
     <li><strong>Account, profile and schedule data</strong> — until your account is deleted, then removed within 30 days.</li>
     <li><strong>Push subscriptions and reminder records</strong> — until you turn off notifications for LazyShift in your browser, the browser withdraws the subscription, or your account is deleted.</li>
     <li><strong>Billing records</strong> — 6 years.</li>
+    <li><strong>Payments without a matching account</strong> — until the payment has been applied to an account, after which a daily clean-up job (at 03:17 UTC) deletes the record, or 90 days if it is never applied. If you ask us to delete your account or data, we also delete these records, for each email address you tell us you used at checkout.</li>
     <li><strong>PDF export email</strong> — until you ask us to delete it.</li>
     <li><strong>Support emails</strong> — 2 years.</li>
     <li><strong>Google Analytics data</strong> — for the retention period set in Google Analytics, at most 14 months.</li>

@@ -8,12 +8,15 @@ const AUTH_SUPABASE_URL      = 'https://tmkrbnkztmohfoohbgfy.supabase.co'
 const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRta3Jibmt6dG1vaGZvb2hiZ2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NzEwMDYsImV4cCI6MjA5NzA0NzAwNn0.3cs4A3nLk8jIEfo4byWpPiJrf59qnli1QiKeM7GiB8I'
 
 // ── Pro checkout switch ─────────────────────────────────────
-// The single place the Lemon Squeezy checkout is turned on. While false,
-// every page shows "Pro: coming soon", startCheckout() does nothing and
-// nothing links to Lemon Squeezy. Set to true to sell Pro: the "Upgrade to
-// Pro" buttons appear and call startCheckout().
-const CHECKOUT_ENABLED = false
-const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac24a-c2e4-4b0d-a790-5782b48b28b3'
+// The single place the Lemon Squeezy checkout is turned on. While true,
+// the "Upgrade to Pro" buttons and the price line ([data-checkout]) show and
+// call startCheckout(). Set to false to stop selling (kill switch): every
+// page falls back to "Pro: coming soon" and startCheckout() does nothing.
+const CHECKOUT_ENABLED = true
+const CHECKOUT_URL     = 'https://lazyshift-uk.lemonsqueezy.com/checkout/buy/4518b792-e431-406f-8f64-ad3a05ad8dd7'
+// Lemon Squeezy customer portal: Pro users manage or cancel their
+// subscription there (sign-in by the email they paid with).
+const CUSTOMER_PORTAL_URL = 'https://lazyshift-uk.lemonsqueezy.com/billing'
 
 ;(function () {
   const { createClient } = window.supabase
@@ -112,6 +115,7 @@ const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac2
     _applyAccess() {
       applyAccessRestrictions()
       updateTrialBanner()
+      updateManageSubscription()
       if (typeof window.updatePushSettingsUI === 'function') window.updatePushSettingsUI()
     },
 
@@ -282,6 +286,14 @@ const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac2
 
   window.startCheckout = () => Auth.startCheckout()
 
+  // "Manage subscription" link (user dropdown in index.html): Pro only.
+  function updateManageSubscription() {
+    const box = document.getElementById('manage-subscription')
+    if (!box) return
+    box.querySelector('a').href = CUSTOMER_PORTAL_URL
+    box.style.display = Auth.getUserStatus() === 'pro' ? '' : 'none'
+  }
+
   window.Auth = Auth
 
   // ── Last known profile (offline fallback) ────────────────
@@ -435,7 +447,7 @@ const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac2
       banner.innerHTML = `
         <span>🎁 Free trial · <strong>${access.trialDaysLeft} day${access.trialDaysLeft !== 1 ? 's' : ''} left</strong></span>
         <a href="#" onclick="openUpgradeOverlay(); return false"
-           style="color:#4ade80; font-weight:700; text-decoration:none; font-size:12px;">See Pro →</a>
+           style="color:#4ade80; font-weight:700; text-decoration:none; font-size:12px;">Upgrade →</a>
       `
       return
     }
@@ -447,7 +459,7 @@ const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac2
     banner.innerHTML = `
       <span>⏰ Trial ended · limited access</span>
       <a href="#" onclick="openUpgradeOverlay(); return false"
-         style="color:#f87171; font-weight:700; text-decoration:none; font-size:12px;">See Pro →</a>
+         style="color:#f87171; font-weight:700; text-decoration:none; font-size:12px;">Upgrade →</a>
     `
   }
 
@@ -458,6 +470,7 @@ const CHECKOUT_URL     = 'https://lazyshift.lemonsqueezy.com/checkout/buy/7bfac2
     Auth.init()
     applyAccessRestrictions()
     updateTrialBanner()
+    updateManageSubscription()
   })
 
 })()

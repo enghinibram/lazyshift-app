@@ -184,6 +184,10 @@ h1 {
 }
 .dropdown-logout:hover { background: #fff0f0; }
 [data-theme="dark"] .dropdown-logout:hover { background: #2a1010; }
+.dropdown-manage { padding: 6px 10px 8px; }
+.dropdown-manage a { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.dropdown-manage a:hover { text-decoration: underline; }
+.dropdown-hint { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; max-width: 200px; }
 
 /* ===== Section ===== */
 .section { margin-bottom: 1.25rem; }
@@ -543,6 +547,7 @@ select:focus { outline: none; border-color: var(--accent); }
 }
 .auth-title { font-size: 20px; font-weight: 700; text-align: center; color: var(--text-main); }
 .auth-sub   { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 4px; }
+.pro-price  { font-size: 14px; font-weight: 600; color: var(--text-main); text-align: center; margin: 0 0 12px; }
 .auth-input {
   padding: 10px 12px;
   border: 1px solid var(--border);
